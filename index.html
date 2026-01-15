@@ -1,0 +1,3284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Threat Intel Daily - Enterprise Cybersecurity Threat Intelligence Platform">
+    <meta name="theme-color" content="#6366f1">
+    <title>Threat Intel Daily | Cybersecurity Threat Intelligence Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { font-family: 'Inter', system-ui, sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --bg-elevated: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-light: rgba(99, 102, 241, 0.1);
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+            --card-shadow-hover: 0 10px 40px rgba(0,0,0,0.08);
+            --dropdown-shadow: 0 10px 40px rgba(0,0,0,0.12);
+        }
+        
+        .dark {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a24;
+            --bg-elevated: #1e1e2a;
+            --text-primary: #f1f5f9;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            --border-color: #27272a;
+            --border-light: #1e1e2a;
+            --accent: #818cf8;
+            --accent-hover: #a5b4fc;
+            --accent-light: rgba(129, 140, 248, 0.1);
+            --accent-glow: rgba(129, 140, 248, 0.2);
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --card-shadow-hover: 0 10px 40px rgba(0,0,0,0.4);
+            --dropdown-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        body {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: background 0.2s, color 0.2s;
+            overflow-x: hidden;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        
+        /* Layout */
+        .sidebar {
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .main-content {
+            background: var(--bg-secondary);
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.2s ease;
+        }
+        
+        .card-hover:hover {
+            box-shadow: var(--card-shadow-hover);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        
+        .card-glow {
+            position: relative;
+        }
+        
+        .card-glow::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(135deg, var(--accent), transparent, var(--accent));
+            border-radius: 17px;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s;
+        }
+        
+        .card-glow:hover::before {
+            opacity: 0.5;
+        }
+        
+        /* Navigation */
+        .nav-item {
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            border-radius: 12px;
+            position: relative;
+        }
+        
+        .nav-item:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+        
+        .nav-item.active {
+            color: var(--accent);
+            background: var(--accent-light);
+            font-weight: 600;
+        }
+        
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 0 3px 3px 0;
+        }
+        
+        /* Inputs */
+        .input {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+        
+        .input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+        
+        .input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        /* Buttons */
+        .btn {
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-elevated);
+            border-color: var(--accent);
+        }
+        
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+        }
+        
+        .btn-ghost:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        /* Badges */
+        .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .badge-high { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .badge-medium { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .badge-low { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        
+        .badge-cve { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .badge-ip { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .badge-domain { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .badge-hash { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+        
+        /* Tags */
+        .tag {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .tag:hover, .tag.active {
+            background: var(--accent-light);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        /* Stats Card */
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+        
+        .stat-card-danger::after { background: var(--danger); }
+        .stat-card-warning::after { background: var(--warning); }
+        .stat-card-info::after { background: var(--info); }
+        .stat-card-success::after { background: var(--success); }
+        
+        /* Table */
+        .table-row {
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.15s;
+        }
+        
+        .table-row:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--dropdown-shadow);
+            min-width: 200px;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s;
+        }
+        
+        .dropdown.open .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        .animate-slide-in { animation: slideIn 0.3s ease-out; }
+        .animate-pulse { animation: pulse 2s infinite; }
+        .animate-spin { animation: spin 1s linear infinite; }
+        
+        /* Skeleton Loading */
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Pages */
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.3s ease-out; }
+        
+        /* Modal */
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: var(--dropdown-shadow);
+        }
+        
+        /* Toast */
+        .toast {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--dropdown-shadow);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                bottom: 0;
+                z-index: 50;
+                width: 280px;
+            }
+            .sidebar.open { left: 0; }
+            .sidebar-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 40;
+                display: none;
+            }
+            .sidebar.open ~ .sidebar-overlay { display: block; }
+        }
+        
+        /* Chart container */
+        .chart-container {
+            position: relative;
+            height: 200px;
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 12px;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            font-size: 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            margin-bottom: 8px;
+        }
+        
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-state-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: var(--bg-tertiary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 32px;
+        }
+        
+        /* IOC Chip */
+        .ioc-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .ioc-chip:hover {
+            transform: scale(1.02);
+        }
+        
+        /* Progress bar */
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Notification dot */
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-primary);
+        }
+        
+        /* Search highlight */
+        .search-highlight {
+            background: rgba(245, 158, 11, 0.3);
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+        
+        /* Actor avatar */
+        .actor-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        /* Trend indicator */
+        .trend-up { color: var(--danger); }
+        .trend-down { color: var(--success); }
+        .trend-stable { color: var(--text-muted); }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 z-30 bg-[var(--bg-primary)] border-b border-[var(--border-color)] px-4 h-16 flex items-center justify-between">
+        <button id="mobileMenuBtn" class="btn btn-ghost p-2">
+            <i class="fas fa-bars text-lg"></i>
+        </button>
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                <i class="fas fa-shield-halved text-white text-sm"></i>
+            </div>
+            <span class="font-bold">Threat Intel</span>
+        </div>
+        <button id="mobileThemeBtn" class="btn btn-ghost p-2">
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block"></i>
+        </button>
+    </header>
+
+    <div class="flex min-h-screen pt-16 lg:pt-0">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar w-[280px] flex-shrink-0 flex flex-col h-screen sticky top-0">
+            <!-- Logo -->
+            <div class="p-6 border-b border-[var(--border-color)]">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                        <i class="fas fa-shield-halved text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg tracking-tight">Threat Intel</h1>
+                        <p class="text-xs text-[var(--text-muted)]">Daily Intelligence</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Search -->
+            <div class="p-4">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-sm"></i>
+                    <input type="text" id="globalSearch" placeholder="Search... (Press /)" 
+                        class="input w-full pl-10 pr-4 py-2.5 text-sm">
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+                <p class="px-3 py-2 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Main</p>
+                
+                <a href="#dashboard" class="nav-item flex items-center gap-3 px-3 py-2.5 active" data-page="dashboard">
+                    <i class="fas fa-chart-pie w-5 text-center"></i>
+                    <span class="font-medium">Dashboard</span>
+                </a>
+                <a href="#news" class="nav-item flex items-center gap-3 px-3 py-2.5" data-page="news">
+                    <i class="fas fa-newspaper w-5 text-center"></i>
+                    <span class="font-medium">News Feed</span>
+                    <span id="newsCount" class="ml-auto text-xs bg-[var(--accent)] text-white px-2 py-0.5 rounded-full">0</span>
+                </a>
+                <a href="#iocs" class="nav-item flex items-center gap-3 px-3 py-2.5" data-page="iocs">
+                    <i class="fas fa-crosshairs w-5 text-center"></i>
+                    <span class="font-medium">IOC Database</span>
+                </a>
+                <a href="#actors" class="nav-item flex items-center gap-3 px-3 py-2.5" data-page="actors">
+                    <i class="fas fa-user-secret w-5 text-center"></i>
+                    <span class="font-medium">Threat Actors</span>
+                </a>
+                
+                <p class="px-3 py-2 mt-4 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Tools</p>
+                
+                <a href="#watchlist" class="nav-item flex items-center gap-3 px-3 py-2.5 relative" data-page="watchlist">
+                    <i class="fas fa-bell w-5 text-center"></i>
+                    <span class="font-medium">Watchlist</span>
+                    <span id="watchlistBadge" class="hidden ml-auto w-5 h-5 bg-[var(--danger)] text-white text-xs rounded-full flex items-center justify-center">0</span>
+                </a>
+                <a href="#reports" class="nav-item flex items-center gap-3 px-3 py-2.5" data-page="reports">
+                    <i class="fas fa-file-alt w-5 text-center"></i>
+                    <span class="font-medium">Reports</span>
+                    <span class="ml-auto text-xs bg-[var(--warning)] text-white px-2 py-0.5 rounded-full">Pro</span>
+                </a>
+                <a href="#integrations" class="nav-item flex items-center gap-3 px-3 py-2.5" data-page="integrations">
+                    <i class="fas fa-plug w-5 text-center"></i>
+                    <span class="font-medium">Integrations</span>
+                </a>
+                
+                <p class="px-3 py-2 mt-4 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">System</p>
+                
+                <a href="#settings" class="nav-item flex items-center gap-3 px-3 py-2.5" data-page="settings">
+                    <i class="fas fa-cog w-5 text-center"></i>
+                    <span class="font-medium">Settings</span>
+                </a>
+            </nav>
+            
+            <!-- Footer -->
+            <div class="p-4 border-t border-[var(--border-color)]">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+                            TI
+                        </div>
+                        <div>
+                            <p class="font-medium text-sm">Free Plan</p>
+                            <p class="text-xs text-[var(--text-muted)]">Upgrade to Pro</p>
+                        </div>
+                    </div>
+                    <button id="themeToggle" class="btn btn-ghost p-2 tooltip" data-tooltip="Toggle theme">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+        
+        <div id="sidebarOverlay" class="sidebar-overlay lg:hidden" onclick="closeSidebar()"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 min-h-screen main-content">
+            <!-- Dashboard Page -->
+            <div id="page-dashboard" class="page active">
+                <div class="p-6 lg:p-8 max-w-[1600px] mx-auto">
+                    <!-- Header -->
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
+                        <div>
+                            <h1 class="text-2xl lg:text-3xl font-bold">Dashboard</h1>
+                            <p class="text-[var(--text-secondary)] mt-1">Real-time threat intelligence overview</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-2 text-sm text-[var(--text-muted)] bg-[var(--bg-primary)] px-4 py-2 rounded-xl border border-[var(--border-color)]">
+                                <span class="w-2 h-2 bg-[var(--success)] rounded-full animate-pulse"></span>
+                                <span>Live • Updated <span id="lastUpdate">just now</span></span>
+                            </div>
+                            <button onclick="refreshAllData()" class="btn btn-primary px-4 py-2">
+                                <i class="fas fa-sync-alt" id="refreshIcon"></i>
+                                <span class="hidden sm:inline">Refresh</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+                        <div class="card stat-card stat-card-danger p-5 lg:p-6">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="text-sm text-[var(--text-muted)] mb-1">Critical Threats</p>
+                                    <p class="text-3xl lg:text-4xl font-bold text-[var(--danger)]" id="statCritical">0</p>
+                                    <p class="text-xs text-[var(--text-muted)] mt-2 flex items-center gap-1">
+                                        <i class="fas fa-arrow-up text-[var(--danger)]"></i>
+                                        <span id="statCriticalTrend">+0 today</span>
+                                    </p>
+                                </div>
+                                <div class="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center">
+                                    <i class="fas fa-skull text-[var(--danger)] text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card stat-card stat-card-warning p-5 lg:p-6">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="text-sm text-[var(--text-muted)] mb-1">New CVEs</p>
+                                    <p class="text-3xl lg:text-4xl font-bold text-[var(--warning)]" id="statCVEs">0</p>
+                                    <p class="text-xs text-[var(--text-muted)] mt-2 flex items-center gap-1">
+                                        <span id="statCVEsCritical">0 critical</span>
+                                    </p>
+                                </div>
+                                <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                                    <i class="fas fa-bug text-[var(--warning)] text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card stat-card stat-card-info p-5 lg:p-6">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="text-sm text-[var(--text-muted)] mb-1">IOCs Extracted</p>
+                                    <p class="text-3xl lg:text-4xl font-bold text-[var(--info)]" id="statIOCs">0</p>
+                                    <p class="text-xs text-[var(--text-muted)] mt-2">
+                                        <span id="statIOCsBreakdown">IPs, domains, hashes</span>
+                                    </p>
+                                </div>
+                                <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                    <i class="fas fa-crosshairs text-[var(--info)] text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card stat-card stat-card-success p-5 lg:p-6">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="text-sm text-[var(--text-muted)] mb-1">Active Actors</p>
+                                    <p class="text-3xl lg:text-4xl font-bold text-[var(--success)]" id="statActors">0</p>
+                                    <p class="text-xs text-[var(--text-muted)] mt-2">
+                                        <span id="statActorsTop">Detected today</span>
+                                    </p>
+                                </div>
+                                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                                    <i class="fas fa-user-secret text-[var(--success)] text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Grid -->
+                    <div class="grid lg:grid-cols-3 gap-6 lg:gap-8">
+                        <!-- Left Column - Chart & News -->
+                        <div class="lg:col-span-2 space-y-6">
+                            <!-- Threat Trend Chart -->
+                            <div class="card p-6">
+                                <div class="flex items-center justify-between mb-6">
+                                    <div>
+                                        <h2 class="font-semibold text-lg">Threat Trends</h2>
+                                        <p class="text-sm text-[var(--text-muted)]">Last 7 days activity</p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button class="tag active" onclick="setChartPeriod('7d')">7D</button>
+                                        <button class="tag" onclick="setChartPeriod('30d')">30D</button>
+                                        <button class="tag" onclick="setChartPeriod('90d')">90D</button>
+                                    </div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="threatChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <!-- Recent Threats -->
+                            <div class="card">
+                                <div class="p-5 border-b border-[var(--border-color)] flex items-center justify-between">
+                                    <div>
+                                        <h2 class="font-semibold text-lg">Latest Threats</h2>
+                                        <p class="text-sm text-[var(--text-muted)]">Most recent security news</p>
+                                    </div>
+                                    <a href="#news" class="text-sm text-[var(--accent)] hover:underline font-medium">View all →</a>
+                                </div>
+                                <div id="dashboardNews" class="divide-y divide-[var(--border-light)]">
+                                    <!-- News items loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column - Sidebar Widgets -->
+                        <div class="space-y-6">
+                            <!-- Threat Actors Widget -->
+                            <div class="card">
+                                <div class="p-5 border-b border-[var(--border-color)]">
+                                    <h2 class="font-semibold">Active Threat Actors</h2>
+                                </div>
+                                <div id="dashboardActors" class="p-4 space-y-3">
+                                    <!-- Actors loaded here -->
+                                </div>
+                                <div class="p-4 pt-0">
+                                    <a href="#actors" class="text-sm text-[var(--accent)] hover:underline font-medium">View all actors →</a>
+                                </div>
+                            </div>
+                            
+                            <!-- IOC Summary Widget -->
+                            <div class="card">
+                                <div class="p-5 border-b border-[var(--border-color)]">
+                                    <h2 class="font-semibold">IOC Summary</h2>
+                                </div>
+                                <div class="p-4 space-y-4" id="dashboardIOCSummary">
+                                    <!-- IOC summary loaded here -->
+                                </div>
+                            </div>
+                            
+                            <!-- Sources Widget -->
+                            <div class="card">
+                                <div class="p-5 border-b border-[var(--border-color)]">
+                                    <h2 class="font-semibold">Intelligence Sources</h2>
+                                </div>
+                                <div id="dashboardSources" class="p-4 space-y-2">
+                                    <!-- Sources loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News Feed Page -->
+            <div id="page-news" class="page">
+                <div class="p-6 lg:p-8 max-w-[1400px] mx-auto">
+                    <!-- Header -->
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h1 class="text-2xl lg:text-3xl font-bold">News Feed</h1>
+                            <p class="text-[var(--text-secondary)] mt-1">Real-time cybersecurity intelligence from trusted sources</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="exportNews()" class="btn btn-secondary px-4 py-2">
+                                <i class="fas fa-download"></i>
+                                <span>Export</span>
+                            </button>
+                            <button onclick="refreshAllData()" class="btn btn-primary px-4 py-2">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>Refresh</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div class="card p-4 mb-6">
+                        <div class="flex flex-col lg:flex-row gap-4">
+                            <div class="flex-1 relative">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"></i>
+                                <input type="text" id="newsSearch" placeholder="Search articles, CVEs, threat actors..." 
+                                    class="input w-full pl-11 pr-4 py-3">
+                            </div>
+                            <div class="flex gap-3 flex-wrap">
+                                <select id="newsCategory" class="input px-4 py-3 min-w-[150px]">
+                                    <option value="all">All Categories</option>
+                                    <option value="vulnerability">Vulnerabilities</option>
+                                    <option value="malware">Malware</option>
+                                    <option value="ransomware">Ransomware</option>
+                                    <option value="apt">APT Groups</option>
+                                    <option value="breach">Data Breaches</option>
+                                </select>
+                                <select id="newsSeverity" class="input px-4 py-3 min-w-[140px]">
+                                    <option value="all">All Severity</option>
+                                    <option value="critical">Critical</option>
+                                    <option value="high">High</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="low">Low</option>
+                                </select>
+                                <select id="newsSource" class="input px-4 py-3 min-w-[160px]">
+                                    <option value="all">All Sources</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Info -->
+                    <div class="flex items-center justify-between mb-4">
+                        <p class="text-sm text-[var(--text-muted)]">
+                            Showing <span id="newsResultCount">0</span> articles
+                        </p>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-[var(--text-muted)]">Sort by:</span>
+                            <select id="newsSort" class="input px-3 py-1.5 text-sm">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="severity">Severity</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- News List -->
+                    <div id="newsList" class="space-y-4">
+                        <!-- News items loaded here -->
+                    </div>
+                    
+                    <!-- Load More -->
+                    <button id="loadMoreNews" onclick="loadMoreNews()" class="w-full mt-6 py-4 card card-hover text-center font-medium">
+                        <i class="fas fa-chevron-down mr-2"></i>Load More Articles
+                    </button>
+                </div>
+            </div>
+
+            <!-- IOCs Page -->
+            <div id="page-iocs" class="page">
+                <div class="p-6 lg:p-8 max-w-[1400px] mx-auto">
+                    <!-- Header -->
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h1 class="text-2xl lg:text-3xl font-bold">IOC Database</h1>
+                            <p class="text-[var(--text-secondary)] mt-1">Indicators of Compromise extracted from threat intelligence</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="dropdown" id="exportDropdown">
+                                <button onclick="toggleDropdown('exportDropdown')" class="btn btn-secondary px-4 py-2">
+                                    <i class="fas fa-download"></i>
+                                    <span>Export</span>
+                                    <i class="fas fa-chevron-down text-xs ml-1"></i>
+                                </button>
+                                <div class="dropdown-menu p-2">
+                                    <button onclick="exportIOCs('json')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-[var(--bg-tertiary)] transition">
+                                        <i class="fas fa-file-code w-5"></i> Export as JSON
+                                    </button>
+                                    <button onclick="exportIOCs('csv')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-[var(--bg-tertiary)] transition">
+                                        <i class="fas fa-file-csv w-5"></i> Export as CSV
+                                    </button>
+                                    <button onclick="exportIOCs('stix')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-[var(--bg-tertiary)] transition">
+                                        <i class="fas fa-file-alt w-5"></i> Export as STIX
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- IOC Stats -->
+                    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                        <button onclick="filterIOCs('all')" class="card card-hover p-4 text-center ioc-filter-btn active" data-type="all">
+                            <p class="text-2xl font-bold" id="iocTotalCount">0</p>
+                            <p class="text-sm text-[var(--text-muted)]">Total IOCs</p>
+                        </button>
+                        <button onclick="filterIOCs('cves')" class="card card-hover p-4 text-center ioc-filter-btn" data-type="cves">
+                            <p class="text-2xl font-bold text-[var(--danger)]" id="iocCVECount">0</p>
+                            <p class="text-sm text-[var(--text-muted)]">CVEs</p>
+                        </button>
+                        <button onclick="filterIOCs('ips')" class="card card-hover p-4 text-center ioc-filter-btn" data-type="ips">
+                            <p class="text-2xl font-bold text-[var(--warning)]" id="iocIPCount">0</p>
+                            <p class="text-sm text-[var(--text-muted)]">IP Addresses</p>
+                        </button>
+                        <button onclick="filterIOCs('domains')" class="card card-hover p-4 text-center ioc-filter-btn" data-type="domains">
+                            <p class="text-2xl font-bold text-[var(--info)]" id="iocDomainCount">0</p>
+                            <p class="text-sm text-[var(--text-muted)]">Domains</p>
+                        </button>
+                        <button onclick="filterIOCs('hashes')" class="card card-hover p-4 text-center ioc-filter-btn" data-type="hashes">
+                            <p class="text-2xl font-bold text-purple-500" id="iocHashCount">0</p>
+                            <p class="text-sm text-[var(--text-muted)]">Hashes</p>
+                        </button>
+                    </div>
+                    
+                    <!-- IOC Table -->
+                    <div class="card overflow-hidden">
+                        <div class="p-4 border-b border-[var(--border-color)] flex items-center justify-between">
+                            <div class="relative flex-1 max-w-md">
+                                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-sm"></i>
+                                <input type="text" id="iocSearch" placeholder="Search IOCs..." 
+                                    class="input w-full pl-10 pr-4 py-2 text-sm">
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-[var(--bg-tertiary)]">
+                                    <tr>
+                                        <th class="text-left px-6 py-4 text-sm font-semibold text-[var(--text-muted)]">Type</th>
+                                        <th class="text-left px-6 py-4 text-sm font-semibold text-[var(--text-muted)]">Value</th>
+                                        <th class="text-left px-6 py-4 text-sm font-semibold text-[var(--text-muted)]">Source</th>
+                                        <th class="text-left px-6 py-4 text-sm font-semibold text-[var(--text-muted)]">First Seen</th>
+                                        <th class="text-right px-6 py-4 text-sm font-semibold text-[var(--text-muted)]">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="iocTable">
+                                    <!-- IOC rows loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 border-t border-[var(--border-color)] flex items-center justify-between">
+                            <p class="text-sm text-[var(--text-muted)]">
+                                Showing <span id="iocShowing">0</span> of <span id="iocTotal">0</span> IOCs
+                            </p>
+                            <div class="flex gap-2">
+                                <button onclick="prevIOCPage()" class="btn btn-secondary px-3 py-1.5 text-sm" id="iocPrevBtn">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button onclick="nextIOCPage()" class="btn btn-secondary px-3 py-1.5 text-sm" id="iocNextBtn">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Threat Actors Page -->
+            <div id="page-actors" class="page">
+                <div class="p-6 lg:p-8 max-w-[1400px] mx-auto">
+                    <!-- Header -->
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h1 class="text-2xl lg:text-3xl font-bold">Threat Actors</h1>
+                            <p class="text-[var(--text-secondary)] mt-1">Known threat actors detected in current intelligence</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Search & Filter -->
+                    <div class="card p-4 mb-6">
+                        <div class="flex flex-col lg:flex-row gap-4">
+                            <div class="flex-1 relative">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"></i>
+                                <input type="text" id="actorSearch" placeholder="Search threat actors..." 
+                                    class="input w-full pl-11 pr-4 py-3">
+                            </div>
+                            <div class="flex gap-2 flex-wrap">
+                                <button onclick="filterActors('all')" class="tag active actor-filter" data-type="all">All</button>
+                                <button onclick="filterActors('ransomware')" class="tag actor-filter" data-type="ransomware">Ransomware</button>
+                                <button onclick="filterActors('apt')" class="tag actor-filter" data-type="apt">APT Groups</button>
+                                <button onclick="filterActors('hacktivist')" class="tag actor-filter" data-type="hacktivist">Hacktivists</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actors Grid -->
+                    <div id="actorsGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <!-- Actor cards loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Watchlist Page -->
+            <div id="page-watchlist" class="page">
+                <div class="p-6 lg:p-8 max-w-[1000px] mx-auto">
+                    <!-- Header -->
+                    <div class="mb-6">
+                        <h1 class="text-2xl lg:text-3xl font-bold">Watchlist</h1>
+                        <p class="text-[var(--text-secondary)] mt-1">Get alerted when these items appear in the feed</p>
+                    </div>
+                    
+                    <!-- Add Item -->
+                    <div class="card p-6 mb-6">
+                        <h3 class="font-semibold mb-4">Add New Item</h3>
+                        <div class="flex gap-3">
+                            <input type="text" id="watchlistInput" placeholder="CVE-2024-1234, LockBit, Microsoft, etc..." 
+                                class="input flex-1 px-4 py-3">
+                            <button onclick="addToWatchlist()" class="btn btn-primary px-6 py-3">
+                                <i class="fas fa-plus"></i>
+                                <span>Add</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mt-4">
+                            <span class="text-sm text-[var(--text-muted)]">Suggestions:</span>
+                            <button onclick="quickAddWatch('Microsoft')" class="tag">Microsoft</button>
+                            <button onclick="quickAddWatch('Cisco')" class="tag">Cisco</button>
+                            <button onclick="quickAddWatch('VMware')" class="tag">VMware</button>
+                            <button onclick="quickAddWatch('LockBit')" class="tag">LockBit</button>
+                            <button onclick="quickAddWatch('Zero-day')" class="tag">Zero-day</button>
+                            <button onclick="quickAddWatch('RCE')" class="tag">RCE</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Watchlist Items -->
+                    <div class="card">
+                        <div class="p-5 border-b border-[var(--border-color)] flex items-center justify-between">
+                            <h3 class="font-semibold">Your Watchlist</h3>
+                            <span class="text-sm text-[var(--text-muted)]" id="watchlistCount">0 items</span>
+                        </div>
+                        <div id="watchlistItems">
+                            <!-- Watchlist items loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Matched Articles -->
+                    <div class="card mt-6">
+                        <div class="p-5 border-b border-[var(--border-color)]">
+                            <h3 class="font-semibold">Matched Articles</h3>
+                            <p class="text-sm text-[var(--text-muted)]">Articles matching your watchlist items</p>
+                        </div>
+                        <div id="watchlistMatches">
+                            <!-- Matched articles loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Page -->
+            <div id="page-reports" class="page">
+                <div class="p-6 lg:p-8 max-w-[1000px] mx-auto">
+                    <div class="text-center py-16">
+                        <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
+                            <i class="fas fa-crown text-3xl text-amber-500"></i>
+                        </div>
+                        <h1 class="text-2xl lg:text-3xl font-bold mb-4">Executive Reports</h1>
+                        <p class="text-[var(--text-secondary)] mb-8 max-w-md mx-auto">
+                            Generate professional threat intelligence reports for leadership briefings and compliance requirements.
+                        </p>
+                        <div class="card p-8 max-w-lg mx-auto">
+                            <h3 class="font-semibold mb-4">Pro Features Include:</h3>
+                            <ul class="text-left space-y-3 mb-6">
+                                <li class="flex items-center gap-3">
+                                    <i class="fas fa-check text-[var(--success)]"></i>
+                                    <span>Automated daily/weekly reports</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <i class="fas fa-check text-[var(--success)]"></i>
+                                    <span>Executive summary generation</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <i class="fas fa-check text-[var(--success)]"></i>
+                                    <span>PDF & Word export</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <i class="fas fa-check text-[var(--success)]"></i>
+                                    <span>Custom branding</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <i class="fas fa-check text-[var(--success)]"></i>
+                                    <span>Scheduled email delivery</span>
+                                </li>
+                            </ul>
+                            <button class="btn btn-primary w-full py-3">
+                                <i class="fas fa-rocket"></i>
+                                Upgrade to Pro
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Integrations Page -->
+            <div id="page-integrations" class="page">
+                <div class="p-6 lg:p-8 max-w-[1200px] mx-auto">
+                    <div class="mb-6">
+                        <h1 class="text-2xl lg:text-3xl font-bold">Integrations</h1>
+                        <p class="text-[var(--text-secondary)] mt-1">Connect with your security tools and workflows</p>
+                    </div>
+                    
+                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- SIEM -->
+                        <div class="card card-hover p-6">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                    <i class="fas fa-server text-blue-500 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">SIEM Export</h3>
+                                    <p class="text-sm text-[var(--text-muted)]">Splunk, Elastic, QRadar</p>
+                                </div>
+                            </div>
+                            <p class="text-sm text-[var(--text-secondary)] mb-4">Export IOCs directly to your SIEM platform for correlation and alerting.</p>
+                            <button class="btn btn-secondary w-full py-2">Configure</button>
+                        </div>
+                        
+                        <!-- SOAR -->
+                        <div class="card card-hover p-6">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                                    <i class="fas fa-robot text-purple-500 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">SOAR Integration</h3>
+                                    <p class="text-sm text-[var(--text-muted)]">Palo Alto XSOAR, Swimlane</p>
+                                </div>
+                            </div>
+                            <p class="text-sm text-[var(--text-secondary)] mb-4">Trigger automated playbooks based on new threat intelligence.</p>
+                            <button class="btn btn-secondary w-full py-2">Configure</button>
+                        </div>
+                        
+                        <!-- Slack -->
+                        <div class="card card-hover p-6">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center">
+                                    <i class="fab fa-slack text-green-500 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">Slack Alerts</h3>
+                                    <p class="text-sm text-[var(--text-muted)]">Real-time notifications</p>
+                                </div>
+                            </div>
+                            <p class="text-sm text-[var(--text-secondary)] mb-4">Get instant alerts in Slack when critical threats are detected.</p>
+                            <button class="btn btn-secondary w-full py-2">Connect</button>
+                        </div>
+                        
+                        <!-- Email -->
+                        <div class="card card-hover p-6">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center">
+                                    <i class="fas fa-envelope text-red-500 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">Email Digest</h3>
+                                    <p class="text-sm text-[var(--text-muted)]">Daily/Weekly summaries</p>
+                                </div>
+                            </div>
+                            <p class="text-sm text-[var(--text-secondary)] mb-4">Receive scheduled email digests with the latest threat intel.</p>
+                            <button class="btn btn-secondary w-full py-2">Configure</button>
+                        </div>
+                        
+                        <!-- Webhook -->
+                        <div class="card card-hover p-6">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                                    <i class="fas fa-plug text-amber-500 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">Webhooks</h3>
+                                    <p class="text-sm text-[var(--text-muted)]">Custom integrations</p>
+                                </div>
+                            </div>
+                            <p class="text-sm text-[var(--text-secondary)] mb-4">Send real-time data to any endpoint with custom webhooks.</p>
+                            <button class="btn btn-secondary w-full py-2">Configure</button>
+                        </div>
+                        
+                        <!-- API -->
+                        <div class="card card-hover p-6">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center">
+                                    <i class="fas fa-code text-indigo-500 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">REST API</h3>
+                                    <p class="text-sm text-[var(--text-muted)]">Developer access</p>
+                                </div>
+                            </div>
+                            <p class="text-sm text-[var(--text-secondary)] mb-4">Full API access for custom integrations and automation.</p>
+                            <button class="btn btn-secondary w-full py-2">View Docs</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="page-settings" class="page">
+                <div class="p-6 lg:p-8 max-w-[800px] mx-auto">
+                    <div class="mb-6">
+                        <h1 class="text-2xl lg:text-3xl font-bold">Settings</h1>
+                        <p class="text-[var(--text-secondary)] mt-1">Configure your threat intelligence dashboard</p>
+                    </div>
+                    
+                    <!-- Appearance -->
+                    <div class="card mb-6">
+                        <div class="p-5 border-b border-[var(--border-color)]">
+                            <h3 class="font-semibold">Appearance</h3>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Theme</p>
+                                    <p class="text-sm text-[var(--text-muted)]">Choose light or dark mode</p>
+                                </div>
+                                <select id="themeSelect" onchange="setTheme(this.value)" class="input px-4 py-2">
+                                    <option value="system">System</option>
+                                    <option value="light">Light</option>
+                                    <option value="dark">Dark</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Compact Mode</p>
+                                    <p class="text-sm text-[var(--text-muted)]">Show more content with smaller cards</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="compactMode" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-[var(--bg-tertiary)] rounded-full peer peer-checked:bg-[var(--accent)] after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full border border-[var(--border-color)]"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Sources -->
+                    <div class="card mb-6">
+                        <div class="p-5 border-b border-[var(--border-color)]">
+                            <h3 class="font-semibold">Data Sources</h3>
+                            <p class="text-sm text-[var(--text-muted)]">Enable or disable intelligence feeds</p>
+                        </div>
+                        <div id="sourcesSettings" class="divide-y divide-[var(--border-light)]">
+                            <!-- Sources loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Notifications -->
+                    <div class="card mb-6">
+                        <div class="p-5 border-b border-[var(--border-color)]">
+                            <h3 class="font-semibold">Notifications</h3>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Browser Notifications</p>
+                                    <p class="text-sm text-[var(--text-muted)]">Get notified of critical threats</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="browserNotifications" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-[var(--bg-tertiary)] rounded-full peer peer-checked:bg-[var(--accent)] after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full border border-[var(--border-color)]"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Watchlist Alerts</p>
+                                    <p class="text-sm text-[var(--text-muted)]">Alert when watchlist items are found</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="watchlistAlerts" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-[var(--bg-tertiary)] rounded-full peer peer-checked:bg-[var(--accent)] after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full border border-[var(--border-color)]"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- About -->
+                    <div class="card">
+                        <div class="p-5 border-b border-[var(--border-color)]">
+                            <h3 class="font-semibold">About</h3>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-shield-halved text-white text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg">Threat Intel Daily</h4>
+                                    <p class="text-sm text-[var(--text-muted)]">Version 2.0.0</p>
+                                </div>
+                            </div>
+                            <p class="text-sm text-[var(--text-secondary)] mb-4">
+                                Enterprise-grade cybersecurity threat intelligence platform. Aggregates news from trusted sources, extracts IOCs, and provides actionable intelligence for security teams.
+                            </p>
+                            <div class="flex gap-3">
+                                <a href="https://github.com" target="_blank" class="btn btn-ghost px-3 py-2 text-sm">
+                                    <i class="fab fa-github"></i> GitHub
+                                </a>
+                                <a href="#" class="btn btn-ghost px-3 py-2 text-sm">
+                                    <i class="fas fa-book"></i> Documentation
+                                </a>
+                                <a href="#" class="btn btn-ghost px-3 py-2 text-sm">
+                                    <i class="fas fa-life-ring"></i> Support
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 space-y-3"></div>
+
+    <!-- IOC Modal -->
+    <div id="iocModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal('iocModal')"></div>
+        <div class="modal-content relative w-full max-w-lg p-6 animate-fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold">IOC Details</h3>
+                <button onclick="closeModal('iocModal')" class="btn btn-ghost p-2">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="iocModalContent"></div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div id="shortcutsModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal('shortcutsModal')"></div>
+        <div class="modal-content relative w-full max-w-md p-6 animate-fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold">Keyboard Shortcuts</h3>
+                <button onclick="closeModal('shortcutsModal')" class="btn btn-ghost p-2">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between py-2">
+                    <span>Search</span>
+                    <kbd class="px-3 py-1 bg-[var(--bg-tertiary)] rounded-lg text-sm mono">/</kbd>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                    <span>Refresh data</span>
+                    <kbd class="px-3 py-1 bg-[var(--bg-tertiary)] rounded-lg text-sm mono">R</kbd>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                    <span>Toggle theme</span>
+                    <kbd class="px-3 py-1 bg-[var(--bg-tertiary)] rounded-lg text-sm mono">T</kbd>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                    <span>Go to Dashboard</span>
+                    <kbd class="px-3 py-1 bg-[var(--bg-tertiary)] rounded-lg text-sm mono">G D</kbd>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                    <span>Go to News</span>
+                    <kbd class="px-3 py-1 bg-[var(--bg-tertiary)] rounded-lg text-sm mono">G N</kbd>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                    <span>Go to IOCs</span>
+                    <kbd class="px-3 py-1 bg-[var(--bg-tertiary)] rounded-lg text-sm mono">G I</kbd>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                    <span>Show shortcuts</span>
+                    <kbd class="px-3 py-1 bg-[var(--bg-tertiary)] rounded-lg text-sm mono">?</kbd>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Article Detail Modal -->
+    <div id="articleModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal('articleModal')"></div>
+        <div class="modal-content relative w-full max-w-4xl max-h-[90vh] overflow-hidden animate-fade-in flex flex-col">
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-[var(--border-color)] flex items-start justify-between gap-4 shrink-0">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-3 flex-wrap">
+                        <span id="articleModalSeverity" class="badge"></span>
+                        <span id="articleModalCategory" class="badge bg-[var(--bg-tertiary)] text-[var(--text-secondary)]"></span>
+                        <span class="text-sm text-[var(--text-muted)]" id="articleModalSource"></span>
+                        <span class="text-sm text-[var(--text-muted)]">•</span>
+                        <span class="text-sm text-[var(--text-muted)]" id="articleModalTime"></span>
+                    </div>
+                    <h2 id="articleModalTitle" class="text-xl lg:text-2xl font-bold leading-tight"></h2>
+                </div>
+                <button onclick="closeModal('articleModal')" class="btn btn-ghost p-2 shrink-0">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body - Scrollable -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <!-- Summary Section -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">
+                        <i class="fas fa-file-alt mr-2"></i>Summary
+                    </h3>
+                    <div class="card p-4 bg-[var(--bg-tertiary)] border-l-4 border-l-[var(--accent)]">
+                        <p id="articleModalSummary" class="text-[var(--text-primary)] leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <!-- Key Insights -->
+                <div class="mb-6" id="articleModalInsights">
+                    <h3 class="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">
+                        <i class="fas fa-lightbulb mr-2"></i>Key Insights
+                    </h3>
+                    <div id="articleModalInsightsList" class="grid gap-3 sm:grid-cols-2"></div>
+                </div>
+
+                <!-- Threat Intelligence Grid -->
+                <div class="grid gap-4 lg:grid-cols-2 mb-6">
+                    <!-- CVEs Section -->
+                    <div id="articleModalCVEsSection" class="hidden">
+                        <h3 class="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">
+                            <i class="fas fa-bug mr-2 text-[var(--danger)]"></i>Vulnerabilities (CVEs)
+                        </h3>
+                        <div class="card p-4 space-y-2" id="articleModalCVEs"></div>
+                    </div>
+
+                    <!-- Threat Actors Section -->
+                    <div id="articleModalActorsSection" class="hidden">
+                        <h3 class="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">
+                            <i class="fas fa-user-secret mr-2 text-purple-500"></i>Threat Actors
+                        </h3>
+                        <div class="card p-4 space-y-2" id="articleModalActors"></div>
+                    </div>
+
+                    <!-- Malware Section -->
+                    <div id="articleModalMalwareSection" class="hidden">
+                        <h3 class="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">
+                            <i class="fas fa-virus mr-2 text-red-500"></i>Malware Mentioned
+                        </h3>
+                        <div class="card p-4 space-y-2" id="articleModalMalware"></div>
+                    </div>
+
+                    <!-- TTPs Section -->
+                    <div id="articleModalTTPsSection" class="hidden">
+                        <h3 class="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">
+                            <i class="fas fa-crosshairs mr-2 text-amber-500"></i>MITRE ATT&CK TTPs
+                        </h3>
+                        <div class="card p-4 space-y-2" id="articleModalTTPs"></div>
+                    </div>
+                </div>
+
+                <!-- IOCs Section -->
+                <div id="articleModalIOCsSection" class="hidden mb-6">
+                    <h3 class="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">
+                        <i class="fas fa-fingerprint mr-2 text-[var(--info)]"></i>Indicators of Compromise (IOCs)
+                    </h3>
+                    <div class="card p-4">
+                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" id="articleModalIOCs"></div>
+                    </div>
+                </div>
+
+                <!-- Related Products/Vendors -->
+                <div id="articleModalVendorsSection" class="hidden mb-6">
+                    <h3 class="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">
+                        <i class="fas fa-building mr-2 text-[var(--success)]"></i>Affected Products & Vendors
+                    </h3>
+                    <div class="flex flex-wrap gap-2" id="articleModalVendors"></div>
+                </div>
+
+                <!-- Recommendations -->
+                <div id="articleModalRecsSection" class="hidden">
+                    <h3 class="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">
+                        <i class="fas fa-shield-alt mr-2 text-[var(--success)]"></i>Recommended Actions
+                    </h3>
+                    <div class="card p-4 bg-green-500/5 border border-green-500/20">
+                        <ul id="articleModalRecs" class="space-y-2"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-6 border-t border-[var(--border-color)] flex flex-col sm:flex-row gap-3 shrink-0 bg-[var(--bg-primary)]">
+                <button onclick="addArticleToWatchlist()" class="btn btn-secondary py-3 px-6 flex-1 sm:flex-none">
+                    <i class="fas fa-bell"></i>
+                    <span>Add to Watchlist</span>
+                </button>
+                <button onclick="copyArticleIOCs()" class="btn btn-secondary py-3 px-6 flex-1 sm:flex-none" id="copyIOCsBtn">
+                    <i class="fas fa-copy"></i>
+                    <span>Copy IOCs</span>
+                </button>
+                <a id="articleModalLink" href="#" target="_blank" class="btn btn-primary py-3 px-6 flex-1 sm:flex-none text-center">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>Read Full Article</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================
+        // CONFIGURATION
+        // =====================================================
+        const CONFIG = {
+            RSS_SOURCES: [
+                { id: 'hackernews', name: 'The Hacker News', url: 'https://feeds.feedburner.com/TheHackersNews', enabled: true, color: '#e53935' },
+                { id: 'bleeping', name: 'BleepingComputer', url: 'https://www.bleepingcomputer.com/feed/', enabled: true, color: '#1565c0' },
+                { id: 'krebs', name: 'Krebs on Security', url: 'https://krebsonsecurity.com/feed/', enabled: true, color: '#2e7d32' },
+                { id: 'darkreading', name: 'Dark Reading', url: 'https://www.darkreading.com/rss.xml', enabled: true, color: '#6a1b9a' },
+                { id: 'securityweek', name: 'SecurityWeek', url: 'https://feeds.feedburner.com/securityweek', enabled: true, color: '#00838f' },
+                { id: 'threatpost', name: 'Threatpost', url: 'https://threatpost.com/feed/', enabled: true, color: '#ef6c00' }
+            ],
+            API_PROXY: 'https://api.rss2json.com/v1/api.json?rss_url=',
+            REFRESH_INTERVAL: 300000, // 5 minutes
+            ITEMS_PER_PAGE: 20
+        };
+
+        const KNOWN_ACTORS = {
+            ransomware: ['LockBit', 'BlackCat', 'ALPHV', 'Cl0p', 'Clop', 'Play', 'Akira', 'Rhysida', 'Black Basta', 'Royal', 'Vice Society', 'Medusa', 'NoEscape', '8Base', 'Hunters International'],
+            apt: ['Lazarus', 'APT28', 'APT29', 'APT41', 'Fancy Bear', 'Cozy Bear', 'Volt Typhoon', 'Sandworm', 'Kimsuky', 'Turla', 'Charming Kitten', 'MuddyWater', 'Midnight Blizzard', 'Star Blizzard', 'Velvet Ant'],
+            hacktivist: ['Scattered Spider', 'LAPSUS$', 'NoName057', 'Killnet', 'Anonymous Sudan', 'IT Army of Ukraine'],
+            cybercrime: ['FIN7', 'FIN11', 'TA505', 'Evil Corp', 'REvil', 'DarkSide', 'Conti', 'Hive', 'Emotet Gang']
+        };
+
+        const ALL_ACTORS = Object.values(KNOWN_ACTORS).flat();
+
+        // =====================================================
+        // STATE
+        // =====================================================
+        let state = {
+            news: [],
+            iocs: { ips: [], domains: [], hashes: [], cves: [], emails: [] },
+            actors: {},
+            watchlist: JSON.parse(localStorage.getItem('watchlist') || '[]'),
+            displayedNews: CONFIG.ITEMS_PER_PAGE,
+            currentIOCFilter: 'all',
+            currentIOCPage: 0,
+            isLoading: false,
+            lastUpdated: null
+        };
+
+        // =====================================================
+        // THEME MANAGEMENT
+        // =====================================================
+        function initTheme() {
+            const saved = localStorage.getItem('theme') || 'system';
+            document.getElementById('themeSelect').value = saved;
+            applyTheme(saved);
+        }
+
+        function setTheme(theme) {
+            localStorage.setItem('theme', theme);
+            applyTheme(theme);
+        }
+
+        function applyTheme(theme) {
+            const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.classList.toggle('dark', isDark);
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            setTheme(isDark ? 'light' : 'dark');
+            document.getElementById('themeSelect').value = isDark ? 'light' : 'dark';
+        }
+
+        // =====================================================
+        // ROUTER
+        // =====================================================
+        function initRouter() {
+            window.addEventListener('hashchange', handleRoute);
+            handleRoute();
+        }
+
+        function handleRoute() {
+            const hash = window.location.hash.replace('#', '') || 'dashboard';
+            
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            const pageEl = document.getElementById(`page-${hash}`);
+            const navEl = document.querySelector(`[data-page="${hash}"]`);
+            
+            if (pageEl) pageEl.classList.add('active');
+            if (navEl) navEl.classList.add('active');
+            
+            closeSidebar();
+        }
+
+        // =====================================================
+        // SIDEBAR
+        // =====================================================
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        document.getElementById('mobileMenuBtn')?.addEventListener('click', toggleSidebar);
+        document.getElementById('mobileThemeBtn')?.addEventListener('click', toggleTheme);
+        document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
+
+        // =====================================================
+        // DATA FETCHING
+        // =====================================================
+        async function fetchAllFeeds() {
+            if (state.isLoading) return;
+            state.isLoading = true;
+            
+            const refreshIcon = document.getElementById('refreshIcon');
+            if (refreshIcon) refreshIcon.classList.add('animate-spin');
+            
+            showLoading();
+            
+            state.news = [];
+            state.iocs = { ips: [], domains: [], hashes: [], cves: [], emails: [] };
+            state.actors = {};
+            
+            const enabledSources = CONFIG.RSS_SOURCES.filter(s => s.enabled);
+            const results = await Promise.allSettled(enabledSources.map(fetchFeed));
+            
+            results.forEach((result) => {
+                if (result.status === 'fulfilled' && result.value) {
+                    state.news = state.news.concat(result.value);
+                }
+            });
+            
+            state.news.sort((a, b) => b.timestamp - a.timestamp);
+            state.lastUpdated = new Date();
+            
+            if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+            state.isLoading = false;
+            
+            updateUI();
+            showToast('Data refreshed successfully', 'success');
+        }
+
+        // Ad and promotional content detection
+        const AD_PATTERNS = {
+            // Common ad/promotional phrases in titles
+            titlePatterns: [
+                /^\s*\[ad\]/i,
+                /^\s*\[sponsored\]/i,
+                /^\s*sponsored:/i,
+                /^\s*advertisement/i,
+                /^\s*promoted:/i,
+                /partner content/i,
+                /brought to you by/i,
+                /limited time offer/i,
+                /exclusive deal/i,
+                /save \d+%/i,
+                /discount code/i,
+                /free trial/i,
+                /sign up now/i,
+                /register today/i,
+                /webinar:/i,
+                /upcoming webinar/i,
+                /join us for/i,
+                /don't miss/i,
+                /last chance/i,
+                /act now/i,
+                /special offer/i,
+                /promo code/i,
+                /giveaway/i,
+                /win a/i,
+                /enter to win/i
+            ],
+            // Promotional/non-security content patterns
+            contentPatterns: [
+                /click here to (buy|purchase|subscribe|register|sign up)/i,
+                /use (code|coupon|promo)/i,
+                /\$\d+(\.\d{2})?\s*(off|discount)/i,
+                /limited time/i,
+                /exclusive offer/i,
+                /subscribe to our newsletter/i,
+                /follow us on/i,
+                /join our mailing list/i,
+                /download our (app|ebook|whitepaper|guide)/i,
+                /check out our (store|shop|products)/i,
+                /affiliate link/i,
+                /sponsored post/i,
+                /paid partnership/i,
+                /this post contains affiliate/i
+            ],
+            // Non-security topics to filter
+            irrelevantTopics: [
+                /best (vpn|antivirus) (deals|discounts|offers)/i,
+                /top \d+ (vpn|antivirus) (services|software) \d{4}/i,
+                /how to (stream|watch|unblock)/i,
+                /netflix|hulu|disney\+|streaming/i,
+                /black friday|cyber monday|holiday (sale|deals)/i,
+                /gift guide/i,
+                /product review:/i,
+                /buying guide/i,
+                /comparison:/i,
+                /vs\./i,
+                /best .* for (gaming|streaming|beginners)/i
+            ],
+            // Domains known for promotional content
+            promotionalDomains: [
+                'bit.ly',
+                'tinyurl.com',
+                'ow.ly',
+                't.co',
+                'goo.gl',
+                'amzn.to',
+                'affiliate',
+                'partner',
+                'promo'
+            ]
+        };
+
+        // Security-related keywords (must contain at least some of these)
+        const SECURITY_KEYWORDS = [
+            'vulnerability', 'cve-', 'exploit', 'malware', 'ransomware', 'phishing',
+            'breach', 'hack', 'attack', 'threat', 'security', 'cyber', 'apt',
+            'zero-day', '0-day', 'patch', 'flaw', 'bug', 'backdoor', 'trojan',
+            'botnet', 'ddos', 'data leak', 'credential', 'authentication',
+            'encryption', 'firewall', 'intrusion', 'incident', 'forensic',
+            'reverse engineering', 'payload', 'command and control', 'c2',
+            'lateral movement', 'privilege escalation', 'persistence',
+            'exfiltration', 'reconnaissance', 'spyware', 'adware', 'rootkit',
+            'keylogger', 'infostealer', 'loader', 'dropper', 'rat', 'remote access',
+            'sql injection', 'xss', 'cross-site', 'csrf', 'rce', 'remote code',
+            'buffer overflow', 'heap overflow', 'use after free', 'race condition',
+            'cisa', 'nist', 'mitre', 'att&ck', 'ioc', 'indicator', 'ttp',
+            'lazarus', 'lockbit', 'blackcat', 'alphv', 'conti', 'revil'
+        ];
+
+        function isAdvertisement(title, content, url) {
+            const titleLower = (title || '').toLowerCase();
+            const contentLower = (content || '').toLowerCase();
+            const urlLower = (url || '').toLowerCase();
+            
+            // Check title patterns
+            for (const pattern of AD_PATTERNS.titlePatterns) {
+                if (pattern.test(title)) {
+                    console.log(`[AD FILTER] Blocked (title pattern): ${title.substring(0, 50)}...`);
+                    return true;
+                }
+            }
+            
+            // Check content patterns
+            for (const pattern of AD_PATTERNS.contentPatterns) {
+                if (pattern.test(content)) {
+                    console.log(`[AD FILTER] Blocked (content pattern): ${title.substring(0, 50)}...`);
+                    return true;
+                }
+            }
+            
+            // Check irrelevant topics
+            for (const pattern of AD_PATTERNS.irrelevantTopics) {
+                if (pattern.test(title) || pattern.test(content)) {
+                    console.log(`[AD FILTER] Blocked (irrelevant topic): ${title.substring(0, 50)}...`);
+                    return true;
+                }
+            }
+            
+            // Check promotional domains in URL
+            for (const domain of AD_PATTERNS.promotionalDomains) {
+                if (urlLower.includes(domain)) {
+                    console.log(`[AD FILTER] Blocked (promotional domain): ${title.substring(0, 50)}...`);
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        function isSecurityRelated(title, content) {
+            const text = ((title || '') + ' ' + (content || '')).toLowerCase();
+            
+            // Check if content contains security-related keywords
+            const matchCount = SECURITY_KEYWORDS.filter(keyword => text.includes(keyword)).length;
+            
+            // Require at least 1 security keyword for shorter content, 2 for longer
+            const minRequired = text.length > 500 ? 2 : 1;
+            
+            if (matchCount < minRequired) {
+                console.log(`[CONTENT FILTER] Low security relevance (${matchCount} keywords): ${(title || '').substring(0, 50)}...`);
+                return false;
+            }
+            
+            return true;
+        }
+
+        function calculateContentQuality(title, content, url) {
+            let score = 50; // Base score
+            
+            const text = ((title || '') + ' ' + (content || '')).toLowerCase();
+            
+            // Positive signals
+            if (/cve-\d{4}-\d+/i.test(text)) score += 20; // Contains CVE
+            if (SECURITY_KEYWORDS.filter(kw => text.includes(kw)).length > 3) score += 15;
+            if (/apt\d+|lazarus|lockbit|ransomware|zero-day/i.test(text)) score += 15;
+            if (text.length > 200) score += 10; // Substantial content
+            if (/patch|update|advisory|bulletin/i.test(text)) score += 10;
+            if (/exploit|actively exploited|in the wild/i.test(text)) score += 15;
+            
+            // Negative signals
+            if (text.length < 50) score -= 20; // Too short
+            if (/opinion|editorial|commentary/i.test(text)) score -= 10;
+            if (/roundup|weekly|digest|newsletter/i.test(title)) score -= 5;
+            if ((text.match(/!/g) || []).length > 2) score -= 10; // Too many exclamation marks
+            if (/click|subscribe|sign up|register/i.test(text)) score -= 15;
+            
+            return Math.max(0, Math.min(100, score));
+        }
+
+        async function fetchFeed(source) {
+            try {
+                const response = await fetch(`${CONFIG.API_PROXY}${encodeURIComponent(source.url)}`);
+                const data = await response.json();
+                
+                if (data.status === 'ok' && data.items) {
+                    const articles = [];
+                    
+                    for (const item of data.items) {
+                        const title = cleanText(item.title);
+                        const content = cleanText(item.description || item.content || '');
+                        const url = item.link;
+                        
+                        // Filter out advertisements and promotional content
+                        if (isAdvertisement(title, content, url)) {
+                            continue;
+                        }
+                        
+                        // Filter out non-security content
+                        if (!isSecurityRelated(title, content)) {
+                            continue;
+                        }
+                        
+                        // Calculate content quality score
+                        const qualityScore = calculateContentQuality(title, content, url);
+                        
+                        // Skip low-quality content (threshold: 30)
+                        if (qualityScore < 30) {
+                            console.log(`[QUALITY FILTER] Low quality score (${qualityScore}): ${title.substring(0, 50)}...`);
+                            continue;
+                        }
+                        
+                        const text = title + ' ' + content;
+                        const iocs = extractIOCs(text);
+                        const actors = extractActors(text);
+                        
+                        // Aggregate IOCs
+                        Object.keys(iocs).forEach(type => {
+                            iocs[type].forEach(ioc => {
+                                if (!state.iocs[type].includes(ioc)) state.iocs[type].push(ioc);
+                            });
+                        });
+                        
+                        // Aggregate actors
+                        actors.forEach(actor => {
+                            state.actors[actor] = (state.actors[actor] || 0) + 1;
+                        });
+                        
+                        articles.push({
+                            id: `${source.id}-${articles.length}-${Date.now()}`,
+                            title: title,
+                            summary: content.substring(0, 300),
+                            source: source,
+                            url: url,
+                            timestamp: new Date(item.pubDate),
+                            category: detectCategory(text),
+                            severity: detectSeverity(text),
+                            iocs,
+                            actors,
+                            readTime: Math.max(1, Math.ceil(text.split(' ').length / 200)),
+                            qualityScore: qualityScore
+                        });
+                    }
+                    
+                    return articles;
+                }
+                return [];
+            } catch (e) {
+                console.error(`Error fetching ${source.name}:`, e);
+                return [];
+            }
+        }
+
+        function cleanText(html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            return doc.body.textContent?.trim() || '';
+        }
+
+        function extractIOCs(text) {
+            const iocs = { ips: [], domains: [], hashes: [], cves: [], emails: [] };
+            
+            // IPs
+            const ipRegex = /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g;
+            const ips = text.match(ipRegex) || [];
+            iocs.ips = [...new Set(ips.filter(ip => !ip.startsWith('10.') && !ip.startsWith('192.168.') && !ip.startsWith('127.')))];
+            
+            // Domains
+            const domainRegex = /\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com|net|org|io|xyz|ru|cn|info|biz|onion|top|pw)\b/gi;
+            iocs.domains = [...new Set((text.match(domainRegex) || []).filter(d => !['google.com', 'twitter.com', 'facebook.com', 'microsoft.com', 'github.com'].some(x => d.includes(x))))].slice(0, 20);
+            
+            // Hashes
+            const hashRegex = /\b[a-fA-F0-9]{32}\b|\b[a-fA-F0-9]{40}\b|\b[a-fA-F0-9]{64}\b/g;
+            iocs.hashes = [...new Set((text.match(hashRegex) || []))].slice(0, 20);
+            
+            // CVEs
+            const cveRegex = /CVE-\d{4}-\d{4,}/gi;
+            iocs.cves = [...new Set((text.match(cveRegex) || []).map(c => c.toUpperCase()))];
+            
+            return iocs;
+        }
+
+        function extractActors(text) {
+            return ALL_ACTORS.filter(actor => text.toLowerCase().includes(actor.toLowerCase()));
+        }
+
+        function detectCategory(text) {
+            const lower = text.toLowerCase();
+            if (['ransomware', 'ransom', 'lockbit', 'blackcat', 'alphv'].some(k => lower.includes(k))) return 'ransomware';
+            if (['malware', 'trojan', 'botnet', 'spyware', 'infostealer'].some(k => lower.includes(k))) return 'malware';
+            if (['vulnerability', 'cve-', 'patch', 'exploit', 'rce'].some(k => lower.includes(k))) return 'vulnerability';
+            if (['breach', 'leak', 'exposed', 'stolen'].some(k => lower.includes(k))) return 'breach';
+            if (['apt', 'nation-state', 'threat actor', 'lazarus'].some(k => lower.includes(k))) return 'apt';
+            return 'general';
+        }
+
+        function detectSeverity(text) {
+            const lower = text.toLowerCase();
+            if (['critical', 'zero-day', 'actively exploited', 'emergency', 'rce', 'remote code execution'].some(k => lower.includes(k))) return 'critical';
+            if (['high', 'important', 'ransomware', 'breach', 'severe'].some(k => lower.includes(k))) return 'high';
+            if (['medium', 'moderate'].some(k => lower.includes(k))) return 'medium';
+            return 'low';
+        }
+
+        // =====================================================
+        // UI UPDATES
+        // =====================================================
+        function updateUI() {
+            updateDashboard();
+            updateNews();
+            updateIOCs();
+            updateActors();
+            updateWatchlist();
+            updateSettings();
+            updateLastUpdate();
+        }
+
+        function updateLastUpdate() {
+            const el = document.getElementById('lastUpdate');
+            if (el && state.lastUpdated) {
+                el.textContent = formatTimeAgo(state.lastUpdated);
+            }
+        }
+
+        function showLoading() {
+            const dashNews = document.getElementById('dashboardNews');
+            if (dashNews && state.news.length === 0) {
+                dashNews.innerHTML = Array(5).fill().map(() => `
+                    <div class="p-4 animate-pulse">
+                        <div class="skeleton h-4 w-3/4 mb-3"></div>
+                        <div class="skeleton h-3 w-1/2"></div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateDashboard() {
+            // Stats
+            const critical = state.news.filter(n => n.severity === 'critical').length;
+            const high = state.news.filter(n => n.severity === 'high').length;
+            
+            document.getElementById('statCritical').textContent = critical;
+            document.getElementById('statCriticalTrend').textContent = `+${critical} today`;
+            document.getElementById('statCVEs').textContent = state.iocs.cves.length;
+            document.getElementById('statCVEsCritical').textContent = `${Math.min(critical, state.iocs.cves.length)} critical`;
+            
+            const totalIOCs = Object.values(state.iocs).flat().length;
+            document.getElementById('statIOCs').textContent = totalIOCs;
+            document.getElementById('statIOCsBreakdown').textContent = `${state.iocs.ips.length} IPs, ${state.iocs.domains.length} domains`;
+            
+            const actorCount = Object.keys(state.actors).length;
+            document.getElementById('statActors').textContent = actorCount;
+            
+            // News count badge
+            document.getElementById('newsCount').textContent = state.news.length;
+            
+            // Recent News
+            const newsEl = document.getElementById('dashboardNews');
+            newsEl.innerHTML = state.news.slice(0, 6).map(n => `
+                <div onclick="showArticleDetail('${n.id}')" class="block p-4 hover:bg-[var(--bg-tertiary)] transition table-row cursor-pointer">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="badge badge-${n.severity}">${n.severity}</span>
+                                <span class="text-xs text-[var(--text-muted)]">${n.source.name}</span>
+                            </div>
+                            <h4 class="font-medium line-clamp-2 hover:text-[var(--accent)] transition">${n.title}</h4>
+                            <p class="text-sm text-[var(--text-muted)] mt-1">${formatTimeAgo(n.timestamp)} • ${n.readTime} min read</p>
+                        </div>
+                        <i class="fas fa-chevron-right text-[var(--text-muted)] mt-2"></i>
+                    </div>
+                </div>
+            `).join('') || '<div class="p-8 text-center text-[var(--text-muted)]">No articles found</div>';
+            
+            // Actors
+            const actorsEl = document.getElementById('dashboardActors');
+            const sortedActors = Object.entries(state.actors).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            actorsEl.innerHTML = sortedActors.map(([actor, count]) => {
+                const type = getActorType(actor);
+                return `
+                    <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-[var(--bg-tertiary)] transition cursor-pointer" onclick="quickAddWatch('${actor}')">
+                        <div class="actor-avatar bg-purple-500/20 text-purple-500">${actor.charAt(0)}</div>
+                        <div class="flex-1">
+                            <p class="font-medium">${actor}</p>
+                            <p class="text-xs text-[var(--text-muted)]">${type} • ${count} mentions</p>
+                        </div>
+                        <i class="fas fa-plus text-[var(--text-muted)] hover:text-[var(--accent)]"></i>
+                    </div>
+                `;
+            }).join('') || '<div class="text-center text-[var(--text-muted)] py-4">No actors detected</div>';
+            
+            // IOC Summary
+            const iocSummaryEl = document.getElementById('dashboardIOCSummary');
+            iocSummaryEl.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+                            <i class="fas fa-bug text-[var(--danger)]"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold">${state.iocs.cves.length}</p>
+                            <p class="text-xs text-[var(--text-muted)]">CVEs</p>
+                        </div>
+                    </div>
+                    <a href="#iocs" class="text-[var(--accent)] text-sm">View</a>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                            <i class="fas fa-network-wired text-[var(--warning)]"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold">${state.iocs.ips.length}</p>
+                            <p class="text-xs text-[var(--text-muted)]">IP Addresses</p>
+                        </div>
+                    </div>
+                    <a href="#iocs" class="text-[var(--accent)] text-sm">View</a>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                            <i class="fas fa-globe text-[var(--info)]"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold">${state.iocs.domains.length}</p>
+                            <p class="text-xs text-[var(--text-muted)]">Domains</p>
+                        </div>
+                    </div>
+                    <a href="#iocs" class="text-[var(--accent)] text-sm">View</a>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                            <i class="fas fa-hashtag text-purple-500"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold">${state.iocs.hashes.length}</p>
+                            <p class="text-xs text-[var(--text-muted)]">Hashes</p>
+                        </div>
+                    </div>
+                    <a href="#iocs" class="text-[var(--accent)] text-sm">View</a>
+                </div>
+            `;
+            
+            // Sources
+            const sourcesEl = document.getElementById('dashboardSources');
+            sourcesEl.innerHTML = CONFIG.RSS_SOURCES.filter(s => s.enabled).map(source => {
+                const count = state.news.filter(n => n.source.id === source.id).length;
+                return `
+                    <div class="flex items-center justify-between py-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full" style="background: ${source.color}"></span>
+                            <span class="text-sm">${source.name}</span>
+                        </div>
+                        <span class="text-sm text-[var(--text-muted)]">${count}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            // Initialize chart
+            initChart();
+        }
+
+        function updateNews() {
+            const search = document.getElementById('newsSearch')?.value.toLowerCase() || '';
+            const category = document.getElementById('newsCategory')?.value || 'all';
+            const severity = document.getElementById('newsSeverity')?.value || 'all';
+            const source = document.getElementById('newsSource')?.value || 'all';
+            const sort = document.getElementById('newsSort')?.value || 'newest';
+            
+            let filtered = state.news.filter(n => {
+                if (search && !n.title.toLowerCase().includes(search) && !n.summary.toLowerCase().includes(search)) return false;
+                if (category !== 'all' && n.category !== category) return false;
+                if (severity !== 'all' && n.severity !== severity) return false;
+                if (source !== 'all' && n.source.id !== source) return false;
+                return true;
+            });
+            
+            // Sort
+            if (sort === 'oldest') filtered.sort((a, b) => a.timestamp - b.timestamp);
+            else if (sort === 'severity') {
+                const order = { critical: 0, high: 1, medium: 2, low: 3 };
+                filtered.sort((a, b) => order[a.severity] - order[b.severity]);
+            }
+            
+            document.getElementById('newsResultCount').textContent = filtered.length;
+            
+            const listEl = document.getElementById('newsList');
+            listEl.innerHTML = filtered.slice(0, state.displayedNews).map(n => {
+                const isWatched = state.watchlist.some(w => n.title.toLowerCase().includes(w.toLowerCase()) || n.summary.toLowerCase().includes(w.toLowerCase()));
+                const hasIOCs = Object.values(n.iocs).flat().length > 0;
+                
+                return `
+                    <article class="card card-hover p-5 cursor-pointer ${isWatched ? 'border-l-4 border-l-[var(--warning)]' : ''}" onclick="showArticleDetail('${n.id}')">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-2 flex-wrap">
+                                    <span class="badge badge-${n.severity}">${n.severity}</span>
+                                    <span class="text-xs text-[var(--text-muted)] flex items-center gap-1">
+                                        <span class="w-2 h-2 rounded-full" style="background: ${n.source.color}"></span>
+                                        ${n.source.name}
+                                    </span>
+                                    <span class="text-xs text-[var(--text-muted)]">•</span>
+                                    <span class="text-xs text-[var(--text-muted)]">${formatTimeAgo(n.timestamp)}</span>
+                                    <span class="text-xs text-[var(--text-muted)]">•</span>
+                                    <span class="text-xs text-[var(--text-muted)]">${n.readTime} min read</span>
+                                    ${n.qualityScore ? `<span class="text-xs text-[var(--text-muted)]">•</span><span class="text-xs ${n.qualityScore >= 70 ? 'text-[var(--success)]' : n.qualityScore >= 50 ? 'text-[var(--warning)]' : 'text-[var(--text-muted)]'}" title="Content quality score"><i class="fas fa-shield-alt mr-1"></i>${n.qualityScore}%</span>` : ''}
+                                    ${isWatched ? '<span class="badge bg-amber-500/20 text-amber-500"><i class="fas fa-bell mr-1"></i>Watchlist</span>' : ''}
+                                </div>
+                                <h3 class="font-semibold text-lg mb-2 hover:text-[var(--accent)] transition">${n.title}</h3>
+                                <p class="text-[var(--text-secondary)] text-sm mb-4 line-clamp-2">${n.summary}</p>
+                                ${hasIOCs ? `
+                                    <div class="flex flex-wrap gap-2">
+                                        ${n.iocs.cves.slice(0, 3).map(cve => `
+                                            <span class="ioc-chip bg-red-500/10 text-[var(--danger)]" onclick="event.stopPropagation(); showIOCModal('cve', '${cve}')">${cve}</span>
+                                        `).join('')}
+                                        ${n.iocs.ips.slice(0, 2).map(ip => `
+                                            <span class="ioc-chip bg-amber-500/10 text-[var(--warning)]" onclick="event.stopPropagation(); showIOCModal('ip', '${ip}')">${ip}</span>
+                                        `).join('')}
+                                        ${n.actors.slice(0, 2).map(actor => `
+                                            <span class="ioc-chip bg-purple-500/10 text-purple-500" onclick="event.stopPropagation();">${actor}</span>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="btn btn-ghost p-2 shrink-0">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('') || '<div class="text-center text-[var(--text-muted)] py-12">No articles found</div>';
+            
+            document.getElementById('loadMoreNews').style.display = state.displayedNews >= filtered.length ? 'none' : 'block';
+            
+            // Update source filter dropdown
+            const sourceSelect = document.getElementById('newsSource');
+            if (sourceSelect.options.length === 1) {
+                CONFIG.RSS_SOURCES.filter(s => s.enabled).forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.textContent = s.name;
+                    sourceSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function updateIOCs() {
+            // Update counts
+            document.getElementById('iocTotalCount').textContent = Object.values(state.iocs).flat().length;
+            document.getElementById('iocCVECount').textContent = state.iocs.cves.length;
+            document.getElementById('iocIPCount').textContent = state.iocs.ips.length;
+            document.getElementById('iocDomainCount').textContent = state.iocs.domains.length;
+            document.getElementById('iocHashCount').textContent = state.iocs.hashes.length;
+            
+            renderIOCTable();
+        }
+
+        function renderIOCTable() {
+            const search = document.getElementById('iocSearch')?.value.toLowerCase() || '';
+            let iocs = [];
+            
+            const types = state.currentIOCFilter === 'all' ? ['cves', 'ips', 'domains', 'hashes'] : [state.currentIOCFilter];
+            
+            types.forEach(type => {
+                state.iocs[type]?.forEach(value => {
+                    if (!search || value.toLowerCase().includes(search)) {
+                        iocs.push({ type, value });
+                    }
+                });
+            });
+            
+            const startIdx = state.currentIOCPage * CONFIG.ITEMS_PER_PAGE;
+            const pageIOCs = iocs.slice(startIdx, startIdx + CONFIG.ITEMS_PER_PAGE);
+            
+            const tableEl = document.getElementById('iocTable');
+            tableEl.innerHTML = pageIOCs.map(ioc => `
+                <tr class="table-row">
+                    <td class="px-6 py-4">
+                        <span class="badge badge-${ioc.type === 'cves' ? 'cve' : ioc.type === 'ips' ? 'ip' : ioc.type === 'domains' ? 'domain' : 'hash'}">
+                            ${ioc.type.replace('s', '').toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <code class="mono text-sm">${ioc.value.length > 50 ? ioc.value.substring(0, 50) + '...' : ioc.value}</code>
+                    </td>
+                    <td class="px-6 py-4 text-[var(--text-muted)]">Feed</td>
+                    <td class="px-6 py-4 text-[var(--text-muted)]">${formatTimeAgo(state.lastUpdated)}</td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex justify-end gap-1">
+                            <button onclick="copyToClipboard('${ioc.value}')" class="btn btn-ghost p-2 text-sm" title="Copy">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button onclick="showIOCModal('${ioc.type}', '${ioc.value}')" class="btn btn-ghost p-2 text-sm" title="Lookup">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="5" class="px-6 py-12 text-center text-[var(--text-muted)]">No IOCs found</td></tr>';
+            
+            document.getElementById('iocShowing').textContent = Math.min(startIdx + CONFIG.ITEMS_PER_PAGE, iocs.length);
+            document.getElementById('iocTotal').textContent = iocs.length;
+            
+            document.getElementById('iocPrevBtn').disabled = state.currentIOCPage === 0;
+            document.getElementById('iocNextBtn').disabled = startIdx + CONFIG.ITEMS_PER_PAGE >= iocs.length;
+        }
+
+        function updateActors() {
+            const search = document.getElementById('actorSearch')?.value.toLowerCase() || '';
+            const filter = document.querySelector('.actor-filter.active')?.dataset.type || 'all';
+            
+            let actors = Object.entries(state.actors)
+                .filter(([actor]) => actor.toLowerCase().includes(search))
+                .filter(([actor]) => {
+                    if (filter === 'all') return true;
+                    return KNOWN_ACTORS[filter]?.includes(actor);
+                })
+                .sort((a, b) => b[1] - a[1]);
+            
+            const gridEl = document.getElementById('actorsGrid');
+            gridEl.innerHTML = actors.map(([actor, count]) => {
+                const type = getActorType(actor);
+                const colors = {
+                    'Ransomware': 'from-red-500 to-orange-500',
+                    'APT Group': 'from-purple-500 to-indigo-500',
+                    'Hacktivist': 'from-green-500 to-teal-500',
+                    'Cybercrime': 'from-yellow-500 to-amber-500'
+                };
+                
+                return `
+                    <div class="card card-hover card-glow p-5">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-14 h-14 rounded-xl bg-gradient-to-br ${colors[type] || 'from-gray-500 to-gray-600'} flex items-center justify-center text-white font-bold text-xl">
+                                ${actor.charAt(0)}
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">${actor}</h3>
+                                <p class="text-sm text-[var(--text-muted)]">${type}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-sm text-[var(--text-muted)]">${count} mention${count !== 1 ? 's' : ''}</span>
+                            <span class="text-sm flex items-center gap-1 trend-up">
+                                <i class="fas fa-arrow-up text-xs"></i> Active
+                            </span>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="https://attack.mitre.org/groups/" target="_blank" class="btn btn-secondary flex-1 py-2 text-sm">
+                                <i class="fas fa-external-link-alt"></i> MITRE
+                            </a>
+                            <button onclick="quickAddWatch('${actor}')" class="btn btn-ghost p-2" title="Add to watchlist">
+                                <i class="fas fa-bell"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('') || '<div class="col-span-full text-center text-[var(--text-muted)] py-12">No threat actors detected</div>';
+        }
+
+        function updateWatchlist() {
+            document.getElementById('watchlistCount').textContent = `${state.watchlist.length} items`;
+            
+            // Update badge
+            const matches = state.news.filter(n => 
+                state.watchlist.some(w => n.title.toLowerCase().includes(w.toLowerCase()) || n.summary.toLowerCase().includes(w.toLowerCase()))
+            ).length;
+            
+            const badge = document.getElementById('watchlistBadge');
+            if (matches > 0) {
+                badge.classList.remove('hidden');
+                badge.classList.add('flex');
+                badge.textContent = matches;
+            } else {
+                badge.classList.add('hidden');
+            }
+            
+            // Watchlist items
+            const itemsEl = document.getElementById('watchlistItems');
+            if (state.watchlist.length === 0) {
+                itemsEl.innerHTML = '<div class="p-8 text-center text-[var(--text-muted)]"><i class="fas fa-bell-slash text-3xl mb-3"></i><p>No items in watchlist</p></div>';
+            } else {
+                itemsEl.innerHTML = state.watchlist.map(item => {
+                    const itemMatches = state.news.filter(n => 
+                        n.title.toLowerCase().includes(item.toLowerCase()) || n.summary.toLowerCase().includes(item.toLowerCase())
+                    ).length;
+                    
+                    return `
+                        <div class="p-4 flex items-center justify-between table-row">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-tag text-[var(--text-muted)]"></i>
+                                <span class="font-medium">${item}</span>
+                                ${itemMatches > 0 ? `<span class="badge bg-amber-500/20 text-amber-500">${itemMatches} matches</span>` : ''}
+                            </div>
+                            <button onclick="removeFromWatchlist('${item}')" class="btn btn-ghost p-2 text-[var(--danger)]">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // Matched articles
+            const matchesEl = document.getElementById('watchlistMatches');
+            const matchedArticles = state.news.filter(n => 
+                state.watchlist.some(w => n.title.toLowerCase().includes(w.toLowerCase()) || n.summary.toLowerCase().includes(w.toLowerCase()))
+            ).slice(0, 10);
+            
+            if (matchedArticles.length === 0) {
+                matchesEl.innerHTML = '<div class="p-8 text-center text-[var(--text-muted)]">No matches found</div>';
+            } else {
+                matchesEl.innerHTML = matchedArticles.map(n => `
+                    <div onclick="showArticleDetail('${n.id}')" class="block p-4 table-row hover:bg-[var(--bg-tertiary)] cursor-pointer">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="badge badge-${n.severity}">${n.severity}</span>
+                            <span class="text-xs text-[var(--text-muted)]">${n.source.name}</span>
+                        </div>
+                        <h4 class="font-medium">${n.title}</h4>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateSettings() {
+            const sourcesEl = document.getElementById('sourcesSettings');
+            sourcesEl.innerHTML = CONFIG.RSS_SOURCES.map((source, idx) => `
+                <div class="p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="w-3 h-3 rounded-full" style="background: ${source.color}"></span>
+                        <span class="font-medium">${source.name}</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" ${source.enabled ? 'checked' : ''} onchange="toggleSource(${idx})" class="sr-only peer">
+                        <div class="w-11 h-6 bg-[var(--bg-tertiary)] rounded-full peer peer-checked:bg-[var(--accent)] after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full border border-[var(--border-color)]"></div>
+                    </label>
+                </div>
+            `).join('');
+        }
+
+        // =====================================================
+        // CHART
+        // =====================================================
+        let threatChart = null;
+        
+        function initChart() {
+            const ctx = document.getElementById('threatChart');
+            if (!ctx) return;
+            
+            if (threatChart) threatChart.destroy();
+            
+            const isDark = document.documentElement.classList.contains('dark');
+            const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+            const textColor = isDark ? '#a1a1aa' : '#64748b';
+            
+            // Generate mock data for last 7 days
+            const labels = [];
+            const criticalData = [];
+            const highData = [];
+            const mediumData = [];
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+                criticalData.push(Math.floor(Math.random() * 10) + 5);
+                highData.push(Math.floor(Math.random() * 20) + 10);
+                mediumData.push(Math.floor(Math.random() * 30) + 15);
+            }
+            
+            threatChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Critical',
+                            data: criticalData,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'High',
+                            data: highData,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Medium',
+                            data: mediumData,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: { color: textColor, usePointStyle: true, padding: 20 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
+                        },
+                        y: {
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+
+        // =====================================================
+        // INTERACTIONS
+        // =====================================================
+        function refreshAllData() {
+            fetchAllFeeds();
+        }
+
+        function loadMoreNews() {
+            state.displayedNews += CONFIG.ITEMS_PER_PAGE;
+            updateNews();
+        }
+
+        function filterIOCs(type) {
+            state.currentIOCFilter = type;
+            state.currentIOCPage = 0;
+            
+            document.querySelectorAll('.ioc-filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === type);
+                btn.classList.toggle('border-[var(--accent)]', btn.dataset.type === type);
+            });
+            
+            renderIOCTable();
+        }
+
+        function prevIOCPage() {
+            if (state.currentIOCPage > 0) {
+                state.currentIOCPage--;
+                renderIOCTable();
+            }
+        }
+
+        function nextIOCPage() {
+            state.currentIOCPage++;
+            renderIOCTable();
+        }
+
+        function filterActors(type) {
+            document.querySelectorAll('.actor-filter').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === type);
+            });
+            updateActors();
+        }
+
+        function addToWatchlist() {
+            const input = document.getElementById('watchlistInput');
+            const value = input.value.trim();
+            if (value && !state.watchlist.includes(value)) {
+                state.watchlist.push(value);
+                localStorage.setItem('watchlist', JSON.stringify(state.watchlist));
+                input.value = '';
+                updateWatchlist();
+                updateNews();
+                showToast(`"${value}" added to watchlist`, 'success');
+            }
+        }
+
+        function quickAddWatch(item) {
+            if (!state.watchlist.includes(item)) {
+                state.watchlist.push(item);
+                localStorage.setItem('watchlist', JSON.stringify(state.watchlist));
+                updateWatchlist();
+                updateNews();
+                showToast(`"${item}" added to watchlist`, 'success');
+            } else {
+                showToast(`"${item}" is already in watchlist`, 'info');
+            }
+        }
+
+        function removeFromWatchlist(item) {
+            state.watchlist = state.watchlist.filter(w => w !== item);
+            localStorage.setItem('watchlist', JSON.stringify(state.watchlist));
+            updateWatchlist();
+            updateNews();
+            showToast(`"${item}" removed from watchlist`, 'success');
+        }
+
+        function toggleSource(idx) {
+            CONFIG.RSS_SOURCES[idx].enabled = !CONFIG.RSS_SOURCES[idx].enabled;
+            showToast(`${CONFIG.RSS_SOURCES[idx].name} ${CONFIG.RSS_SOURCES[idx].enabled ? 'enabled' : 'disabled'}`, 'success');
+        }
+
+        function toggleDropdown(id) {
+            document.getElementById(id).classList.toggle('open');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            showToast('Copied to clipboard', 'success');
+        }
+
+        function exportIOCs(format) {
+            const data = {
+                exported_at: new Date().toISOString(),
+                source: 'Threat Intel Daily',
+                iocs: state.iocs,
+                actors: Object.keys(state.actors)
+            };
+            
+            let content, filename, type;
+            
+            if (format === 'csv') {
+                content = 'type,value\n' + Object.entries(state.iocs).flatMap(([type, values]) => 
+                    values.map(v => `${type},"${v}"`)
+                ).join('\n');
+                filename = 'iocs.csv';
+                type = 'text/csv';
+            } else if (format === 'stix') {
+                // Simplified STIX format
+                content = JSON.stringify({
+                    type: 'bundle',
+                    id: `bundle--${Date.now()}`,
+                    objects: state.iocs.cves.map(cve => ({
+                        type: 'vulnerability',
+                        id: `vulnerability--${cve}`,
+                        name: cve
+                    }))
+                }, null, 2);
+                filename = 'iocs.stix.json';
+                type = 'application/json';
+            } else {
+                content = JSON.stringify(data, null, 2);
+                filename = 'iocs.json';
+                type = 'application/json';
+            }
+            
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            toggleDropdown('exportDropdown');
+            showToast(`IOCs exported as ${format.toUpperCase()}`, 'success');
+        }
+
+        function exportNews() {
+            const data = state.news.map(n => ({
+                title: n.title,
+                url: n.url,
+                source: n.source.name,
+                severity: n.severity,
+                category: n.category,
+                published: n.timestamp,
+                iocs: n.iocs,
+                actors: n.actors
+            }));
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'threat-intel-news.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('News exported', 'success');
+        }
+
+        // Current article for modal
+        let currentArticle = null;
+
+        // Known malware families for detection
+        const KNOWN_MALWARE = [
+            'Emotet', 'TrickBot', 'Qakbot', 'QBot', 'IcedID', 'BazarLoader', 'Cobalt Strike',
+            'Mimikatz', 'BloodHound', 'Metasploit', 'Sliver', 'Brute Ratel', 'Havoc',
+            'AsyncRAT', 'RemcosRAT', 'NjRAT', 'DarkComet', 'Agent Tesla', 'FormBook',
+            'RedLine', 'Raccoon', 'Vidar', 'Mars Stealer', 'Lumma', 'StealC',
+            'BlackMatter', 'DarkSide', 'REvil', 'Sodinokibi', 'Ryuk', 'Conti',
+            'WannaCry', 'NotPetya', 'Petya', 'Bad Rabbit', 'LockerGoga',
+            'Dridex', 'Ursnif', 'Gozi', 'Zeus', 'Kronos', 'Panda Banker',
+            'SmokeLoader', 'Bumblebee', 'ChromeLoader', 'SocGholish', 'BATLOADER',
+            'PlugX', 'ShadowPad', 'Winnti', 'Korplug', 'PoisonIvy',
+            'BlackEnergy', 'Industroyer', 'Triton', 'Stuxnet', 'Duqu',
+            'Pegasus', 'Predator', 'FinSpy', 'Candiru', 'Hermit'
+        ];
+
+        // Known vendors for detection
+        const KNOWN_VENDORS = [
+            'Microsoft', 'Google', 'Apple', 'Amazon', 'Cisco', 'VMware', 'Citrix',
+            'Fortinet', 'Palo Alto', 'CrowdStrike', 'SentinelOne', 'Sophos', 'Trend Micro',
+            'Adobe', 'Oracle', 'SAP', 'Salesforce', 'ServiceNow', 'Atlassian',
+            'Zoom', 'Slack', 'Teams', 'WordPress', 'Drupal', 'Joomla',
+            'Linux', 'Ubuntu', 'Red Hat', 'Debian', 'CentOS', 'SUSE',
+            'Windows', 'macOS', 'iOS', 'Android', 'Chrome', 'Firefox', 'Edge',
+            'AWS', 'Azure', 'GCP', 'Kubernetes', 'Docker', 'Jenkins',
+            'F5', 'Ivanti', 'Pulse Secure', 'SonicWall', 'Barracuda', 'Zyxel',
+            'QNAP', 'Synology', 'D-Link', 'TP-Link', 'Netgear', 'Ubiquiti',
+            'Veeam', 'Veritas', 'Acronis', 'Commvault', 'Dell', 'HP', 'Lenovo',
+            'Intel', 'AMD', 'NVIDIA', 'Qualcomm', 'Broadcom', 'Realtek',
+            'OpenSSL', 'Apache', 'Nginx', 'Tomcat', 'IIS', 'Exchange',
+            'SharePoint', 'OneDrive', 'Outlook', 'Office 365', 'Teams',
+            'MOVEit', 'GoAnywhere', 'Accellion', 'FileZilla', 'WinSCP'
+        ];
+
+        function extractMalware(text) {
+            const found = [];
+            const lowerText = text.toLowerCase();
+            KNOWN_MALWARE.forEach(malware => {
+                if (lowerText.includes(malware.toLowerCase())) {
+                    found.push(malware);
+                }
+            });
+            return [...new Set(found)];
+        }
+
+        function extractVendors(text) {
+            const found = [];
+            const lowerText = text.toLowerCase();
+            KNOWN_VENDORS.forEach(vendor => {
+                if (lowerText.includes(vendor.toLowerCase())) {
+                    found.push(vendor);
+                }
+            });
+            return [...new Set(found)];
+        }
+
+        function extractTTPs(text) {
+            const ttps = [];
+            const lowerText = text.toLowerCase();
+            
+            const patterns = {
+                'T1566': { name: 'Phishing', keywords: ['phishing', 'spear-phishing', 'email attack'] },
+                'T1190': { name: 'Exploit Public-Facing App', keywords: ['exploit', 'rce', 'remote code execution'] },
+                'T1486': { name: 'Data Encrypted for Impact', keywords: ['ransomware', 'encrypt', 'ransom'] },
+                'T1078': { name: 'Valid Accounts', keywords: ['credential', 'stolen password', 'account compromise'] },
+                'T1059': { name: 'Command & Scripting', keywords: ['powershell', 'script', 'command line', 'bash'] },
+                'T1071': { name: 'Application Layer Protocol', keywords: ['c2', 'command and control', 'beacon'] },
+                'T1055': { name: 'Process Injection', keywords: ['process injection', 'dll injection', 'code injection'] },
+                'T1021': { name: 'Remote Services', keywords: ['rdp', 'ssh', 'remote desktop', 'lateral movement'] },
+                'T1562': { name: 'Impair Defenses', keywords: ['disable antivirus', 'edr bypass', 'defender'] },
+                'T1070': { name: 'Indicator Removal', keywords: ['log deletion', 'clear logs', 'anti-forensics'] },
+                'T1110': { name: 'Brute Force', keywords: ['brute force', 'password spray', 'credential stuffing'] },
+                'T1053': { name: 'Scheduled Task/Job', keywords: ['scheduled task', 'cron', 'persistence'] }
+            };
+            
+            Object.entries(patterns).forEach(([id, data]) => {
+                if (data.keywords.some(kw => lowerText.includes(kw))) {
+                    ttps.push({ id, name: data.name });
+                }
+            });
+            
+            return ttps;
+        }
+
+        function generateInsights(article) {
+            const insights = [];
+            const text = (article.title + ' ' + article.summary).toLowerCase();
+            
+            // Severity-based insight
+            if (article.severity === 'critical') {
+                insights.push({ icon: 'fa-exclamation-triangle', color: 'text-red-500', text: 'Critical severity - immediate attention required' });
+            }
+            
+            // Zero-day detection
+            if (text.includes('zero-day') || text.includes('0-day') || text.includes('actively exploited')) {
+                insights.push({ icon: 'fa-bolt', color: 'text-amber-500', text: 'Active exploitation detected in the wild' });
+            }
+            
+            // Ransomware
+            if (article.category === 'ransomware' || text.includes('ransomware')) {
+                insights.push({ icon: 'fa-lock', color: 'text-red-500', text: 'Ransomware-related threat' });
+            }
+            
+            // Data breach
+            if (text.includes('breach') || text.includes('leak') || text.includes('exposed')) {
+                insights.push({ icon: 'fa-database', color: 'text-orange-500', text: 'Data breach or exposure reported' });
+            }
+            
+            // Patch available
+            if (text.includes('patch') || text.includes('update') || text.includes('fix')) {
+                insights.push({ icon: 'fa-wrench', color: 'text-green-500', text: 'Patch or mitigation may be available' });
+            }
+            
+            // APT/Nation-state
+            if (text.includes('apt') || text.includes('nation-state') || text.includes('state-sponsored')) {
+                insights.push({ icon: 'fa-flag', color: 'text-purple-500', text: 'Nation-state or APT involvement suspected' });
+            }
+            
+            // Supply chain
+            if (text.includes('supply chain') || text.includes('third-party') || text.includes('vendor')) {
+                insights.push({ icon: 'fa-link', color: 'text-blue-500', text: 'Supply chain implications' });
+            }
+            
+            // Financial impact
+            if (text.includes('million') || text.includes('billion') || text.includes('ransom paid')) {
+                insights.push({ icon: 'fa-dollar-sign', color: 'text-green-500', text: 'Significant financial impact reported' });
+            }
+            
+            return insights.slice(0, 4); // Max 4 insights
+        }
+
+        function generateRecommendations(article) {
+            const recs = [];
+            const text = (article.title + ' ' + article.summary).toLowerCase();
+            
+            if (article.iocs.cves.length > 0) {
+                recs.push('Check if affected systems have the vulnerable software versions installed');
+                recs.push('Review vendor advisories and apply patches immediately if available');
+            }
+            
+            if (text.includes('ransomware')) {
+                recs.push('Verify backup integrity and ensure offline backups are current');
+                recs.push('Review endpoint detection rules for ransomware indicators');
+            }
+            
+            if (text.includes('phishing')) {
+                recs.push('Alert users about the phishing campaign and update email filters');
+                recs.push('Review email gateway logs for similar patterns');
+            }
+            
+            if (article.iocs.ips.length > 0 || article.iocs.domains.length > 0) {
+                recs.push('Block identified IOCs at firewall and DNS level');
+                recs.push('Search SIEM/EDR for historical connections to these indicators');
+            }
+            
+            if (text.includes('credential') || text.includes('password')) {
+                recs.push('Enforce password resets for potentially affected accounts');
+                recs.push('Review authentication logs for suspicious activity');
+            }
+            
+            if (text.includes('zero-day') || text.includes('actively exploited')) {
+                recs.push('Implement temporary mitigations until patch is available');
+                recs.push('Increase monitoring on affected systems');
+            }
+            
+            if (recs.length === 0) {
+                recs.push('Monitor for additional details and IOCs as they become available');
+                recs.push('Share this intelligence with relevant security teams');
+            }
+            
+            return [...new Set(recs)].slice(0, 4); // Max 4 unique recommendations
+        }
+
+        function showArticleDetail(articleId) {
+            const article = state.news.find(n => n.id === articleId);
+            if (!article) return;
+            
+            currentArticle = article;
+            const fullText = article.title + ' ' + article.summary;
+            
+            // Extract additional intelligence
+            const malware = extractMalware(fullText);
+            const vendors = extractVendors(fullText);
+            const ttps = extractTTPs(fullText);
+            const insights = generateInsights(article);
+            const recommendations = generateRecommendations(article);
+            
+            // Populate modal header
+            document.getElementById('articleModalTitle').textContent = article.title;
+            document.getElementById('articleModalSeverity').className = `badge badge-${article.severity}`;
+            document.getElementById('articleModalSeverity').textContent = article.severity;
+            document.getElementById('articleModalCategory').textContent = article.category;
+            document.getElementById('articleModalSource').innerHTML = `<span class="inline-block w-2 h-2 rounded-full mr-1" style="background:${article.source.color}"></span>${article.source.name}`;
+            document.getElementById('articleModalTime').textContent = formatTimeAgo(article.timestamp);
+            document.getElementById('articleModalLink').href = article.url;
+            
+            // Summary
+            document.getElementById('articleModalSummary').textContent = article.summary || 'No summary available. Click "Read Full Article" for complete details.';
+            
+            // Insights
+            const insightsSection = document.getElementById('articleModalInsights');
+            const insightsList = document.getElementById('articleModalInsightsList');
+            if (insights.length > 0) {
+                insightsSection.classList.remove('hidden');
+                insightsList.innerHTML = insights.map(i => `
+                    <div class="card p-3 flex items-center gap-3">
+                        <i class="fas ${i.icon} ${i.color}"></i>
+                        <span class="text-sm">${i.text}</span>
+                    </div>
+                `).join('');
+            } else {
+                insightsSection.classList.add('hidden');
+            }
+            
+            // CVEs
+            const cvesSection = document.getElementById('articleModalCVEsSection');
+            const cvesList = document.getElementById('articleModalCVEs');
+            if (article.iocs.cves.length > 0) {
+                cvesSection.classList.remove('hidden');
+                cvesList.innerHTML = article.iocs.cves.map(cve => `
+                    <div class="flex items-center justify-between p-2 rounded-lg hover:bg-[var(--bg-tertiary)] transition">
+                        <div class="flex items-center gap-2">
+                            <span class="badge badge-cve">${cve}</span>
+                        </div>
+                        <div class="flex gap-1">
+                            <a href="https://nvd.nist.gov/vuln/detail/${cve}" target="_blank" class="btn btn-ghost p-1.5 text-xs" title="NVD">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                            <button onclick="copyToClipboard('${cve}')" class="btn btn-ghost p-1.5 text-xs" title="Copy">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                cvesSection.classList.add('hidden');
+            }
+            
+            // Threat Actors
+            const actorsSection = document.getElementById('articleModalActorsSection');
+            const actorsList = document.getElementById('articleModalActors');
+            if (article.actors.length > 0) {
+                actorsSection.classList.remove('hidden');
+                actorsList.innerHTML = article.actors.map(actor => `
+                    <div class="flex items-center justify-between p-2 rounded-lg hover:bg-[var(--bg-tertiary)] transition">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-500 font-bold text-sm">${actor.charAt(0)}</div>
+                            <div>
+                                <p class="font-medium text-sm">${actor}</p>
+                                <p class="text-xs text-[var(--text-muted)]">${getActorType(actor)}</p>
+                            </div>
+                        </div>
+                        <a href="https://attack.mitre.org/groups/" target="_blank" class="btn btn-ghost p-1.5 text-xs" title="MITRE ATT&CK">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                `).join('');
+            } else {
+                actorsSection.classList.add('hidden');
+            }
+            
+            // Malware
+            const malwareSection = document.getElementById('articleModalMalwareSection');
+            const malwareList = document.getElementById('articleModalMalware');
+            if (malware.length > 0) {
+                malwareSection.classList.remove('hidden');
+                malwareList.innerHTML = malware.map(m => `
+                    <div class="flex items-center gap-2 p-2 rounded-lg hover:bg-[var(--bg-tertiary)] transition">
+                        <i class="fas fa-virus text-red-500"></i>
+                        <span class="font-medium text-sm">${m}</span>
+                        <a href="https://malpedia.caad.fkie.fraunhofer.de/search?q=${encodeURIComponent(m)}" target="_blank" class="ml-auto btn btn-ghost p-1.5 text-xs" title="Malpedia">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                `).join('');
+            } else {
+                malwareSection.classList.add('hidden');
+            }
+            
+            // TTPs
+            const ttpsSection = document.getElementById('articleModalTTPsSection');
+            const ttpsList = document.getElementById('articleModalTTPs');
+            if (ttps.length > 0) {
+                ttpsSection.classList.remove('hidden');
+                ttpsList.innerHTML = ttps.map(ttp => `
+                    <div class="flex items-center justify-between p-2 rounded-lg hover:bg-[var(--bg-tertiary)] transition">
+                        <div class="flex items-center gap-2">
+                            <span class="badge bg-amber-500/15 text-amber-500">${ttp.id}</span>
+                            <span class="text-sm">${ttp.name}</span>
+                        </div>
+                        <a href="https://attack.mitre.org/techniques/${ttp.id}/" target="_blank" class="btn btn-ghost p-1.5 text-xs" title="MITRE ATT&CK">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                `).join('');
+            } else {
+                ttpsSection.classList.add('hidden');
+            }
+            
+            // IOCs (IPs, Domains, Hashes)
+            const iocsSection = document.getElementById('articleModalIOCsSection');
+            const iocsList = document.getElementById('articleModalIOCs');
+            const hasIOCs = article.iocs.ips.length > 0 || article.iocs.domains.length > 0 || article.iocs.hashes.length > 0;
+            
+            if (hasIOCs) {
+                iocsSection.classList.remove('hidden');
+                let iocsHtml = '';
+                
+                if (article.iocs.ips.length > 0) {
+                    iocsHtml += `
+                        <div>
+                            <p class="text-xs text-[var(--text-muted)] mb-2 font-semibold">IP Addresses</p>
+                            <div class="space-y-1">
+                                ${article.iocs.ips.slice(0, 5).map(ip => `
+                                    <div class="ioc-chip bg-amber-500/10 text-[var(--warning)] w-full justify-between" onclick="showIOCModal('ip', '${ip}')">
+                                        <span class="mono text-xs truncate">${ip}</span>
+                                        <i class="fas fa-search text-xs"></i>
+                                    </div>
+                                `).join('')}
+                                ${article.iocs.ips.length > 5 ? `<p class="text-xs text-[var(--text-muted)]">+${article.iocs.ips.length - 5} more</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (article.iocs.domains.length > 0) {
+                    iocsHtml += `
+                        <div>
+                            <p class="text-xs text-[var(--text-muted)] mb-2 font-semibold">Domains</p>
+                            <div class="space-y-1">
+                                ${article.iocs.domains.slice(0, 5).map(d => `
+                                    <div class="ioc-chip bg-blue-500/10 text-[var(--info)] w-full justify-between" onclick="showIOCModal('domain', '${d}')">
+                                        <span class="mono text-xs truncate">${d}</span>
+                                        <i class="fas fa-search text-xs"></i>
+                                    </div>
+                                `).join('')}
+                                ${article.iocs.domains.length > 5 ? `<p class="text-xs text-[var(--text-muted)]">+${article.iocs.domains.length - 5} more</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (article.iocs.hashes.length > 0) {
+                    iocsHtml += `
+                        <div>
+                            <p class="text-xs text-[var(--text-muted)] mb-2 font-semibold">File Hashes</p>
+                            <div class="space-y-1">
+                                ${article.iocs.hashes.slice(0, 3).map(h => `
+                                    <div class="ioc-chip bg-purple-500/10 text-purple-500 w-full justify-between" onclick="showIOCModal('hash', '${h}')">
+                                        <span class="mono text-xs truncate">${h.substring(0, 20)}...</span>
+                                        <i class="fas fa-search text-xs"></i>
+                                    </div>
+                                `).join('')}
+                                ${article.iocs.hashes.length > 3 ? `<p class="text-xs text-[var(--text-muted)]">+${article.iocs.hashes.length - 3} more</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                iocsList.innerHTML = iocsHtml;
+            } else {
+                iocsSection.classList.add('hidden');
+            }
+            
+            // Vendors
+            const vendorsSection = document.getElementById('articleModalVendorsSection');
+            const vendorsList = document.getElementById('articleModalVendors');
+            if (vendors.length > 0) {
+                vendorsSection.classList.remove('hidden');
+                vendorsList.innerHTML = vendors.map(v => `
+                    <span class="tag">${v}</span>
+                `).join('');
+            } else {
+                vendorsSection.classList.add('hidden');
+            }
+            
+            // Recommendations
+            const recsSection = document.getElementById('articleModalRecsSection');
+            const recsList = document.getElementById('articleModalRecs');
+            if (recommendations.length > 0) {
+                recsSection.classList.remove('hidden');
+                recsList.innerHTML = recommendations.map(r => `
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-[var(--success)] mt-0.5"></i>
+                        <span class="text-sm">${r}</span>
+                    </li>
+                `).join('');
+            } else {
+                recsSection.classList.add('hidden');
+            }
+            
+            // Show/hide copy IOCs button based on IOC availability
+            const copyBtn = document.getElementById('copyIOCsBtn');
+            const totalIOCs = Object.values(article.iocs).flat().length;
+            copyBtn.style.display = totalIOCs > 0 ? 'flex' : 'none';
+            
+            // Open modal
+            document.getElementById('articleModal').classList.remove('hidden');
+            document.getElementById('articleModal').classList.add('flex');
+        }
+
+        function addArticleToWatchlist() {
+            if (!currentArticle) return;
+            
+            // Add title keywords to watchlist
+            const keywords = currentArticle.title.split(' ').filter(w => w.length > 5).slice(0, 2);
+            const toAdd = [...currentArticle.iocs.cves, ...currentArticle.actors, ...keywords].slice(0, 3);
+            
+            toAdd.forEach(item => {
+                if (item && !state.watchlist.includes(item)) {
+                    state.watchlist.push(item);
+                }
+            });
+            
+            localStorage.setItem('watchlist', JSON.stringify(state.watchlist));
+            updateWatchlist();
+            showToast('Added to watchlist', 'success');
+        }
+
+        function copyArticleIOCs() {
+            if (!currentArticle) return;
+            
+            const iocs = {
+                cves: currentArticle.iocs.cves,
+                ips: currentArticle.iocs.ips,
+                domains: currentArticle.iocs.domains,
+                hashes: currentArticle.iocs.hashes
+            };
+            
+            const text = Object.entries(iocs)
+                .filter(([_, v]) => v.length > 0)
+                .map(([type, values]) => `${type.toUpperCase()}:\n${values.join('\n')}`)
+                .join('\n\n');
+            
+            if (text) {
+                navigator.clipboard.writeText(text);
+                showToast('IOCs copied to clipboard', 'success');
+            } else {
+                showToast('No IOCs to copy', 'info');
+            }
+        }
+
+        function showIOCModal(type, value) {
+            event?.stopPropagation();
+            
+            let links = '';
+            if (type === 'cve' || type === 'cves') {
+                links = `
+                    <a href="https://nvd.nist.gov/vuln/detail/${value}" target="_blank" class="btn btn-secondary w-full py-3 mb-2">
+                        <i class="fas fa-database"></i> NVD Database
+                    </a>
+                    <a href="https://www.cvedetails.com/cve/${value}/" target="_blank" class="btn btn-secondary w-full py-3">
+                        <i class="fas fa-info-circle"></i> CVE Details
+                    </a>
+                `;
+            } else if (type === 'ip' || type === 'ips') {
+                links = `
+                    <a href="https://www.virustotal.com/gui/ip-address/${value}" target="_blank" class="btn btn-secondary w-full py-3 mb-2">
+                        <i class="fas fa-virus"></i> VirusTotal
+                    </a>
+                    <a href="https://www.abuseipdb.com/check/${value}" target="_blank" class="btn btn-secondary w-full py-3 mb-2">
+                        <i class="fas fa-ban"></i> AbuseIPDB
+                    </a>
+                    <a href="https://www.shodan.io/host/${value}" target="_blank" class="btn btn-secondary w-full py-3">
+                        <i class="fas fa-search"></i> Shodan
+                    </a>
+                `;
+            } else if (type === 'hash' || type === 'hashes') {
+                links = `
+                    <a href="https://www.virustotal.com/gui/file/${value}" target="_blank" class="btn btn-secondary w-full py-3">
+                        <i class="fas fa-virus"></i> VirusTotal
+                    </a>
+                `;
+            } else if (type === 'domain' || type === 'domains') {
+                links = `
+                    <a href="https://www.virustotal.com/gui/domain/${value}" target="_blank" class="btn btn-secondary w-full py-3 mb-2">
+                        <i class="fas fa-virus"></i> VirusTotal
+                    </a>
+                    <a href="https://urlscan.io/search/#${value}" target="_blank" class="btn btn-secondary w-full py-3">
+                        <i class="fas fa-link"></i> URLScan
+                    </a>
+                `;
+            }
+            
+            document.getElementById('iocModalContent').innerHTML = `
+                <div class="p-4 bg-[var(--bg-tertiary)] rounded-xl mb-4">
+                    <p class="text-xs text-[var(--text-muted)] mb-1">${type.toUpperCase()}</p>
+                    <p class="mono text-sm break-all font-medium">${value}</p>
+                </div>
+                <button onclick="copyToClipboard('${value}')" class="btn btn-primary w-full py-3 mb-4">
+                    <i class="fas fa-copy"></i> Copy to Clipboard
+                </button>
+                <p class="text-sm text-[var(--text-muted)] mb-3">External Lookups</p>
+                ${links}
+            `;
+            
+            document.getElementById('iocModal').classList.remove('hidden');
+            document.getElementById('iocModal').classList.add('flex');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        // =====================================================
+        // UTILITIES
+        // =====================================================
+        function formatTimeAgo(date) {
+            if (!date) return '';
+            const now = new Date();
+            const diff = Math.floor((now - new Date(date)) / 1000 / 60);
+            if (diff < 1) return 'just now';
+            if (diff < 60) return `${diff}m ago`;
+            if (diff < 1440) return `${Math.floor(diff / 60)}h ago`;
+            return `${Math.floor(diff / 1440)}d ago`;
+        }
+
+        function getActorType(actor) {
+            if (KNOWN_ACTORS.ransomware.includes(actor)) return 'Ransomware';
+            if (KNOWN_ACTORS.apt.includes(actor)) return 'APT Group';
+            if (KNOWN_ACTORS.hacktivist.includes(actor)) return 'Hacktivist';
+            if (KNOWN_ACTORS.cybercrime.includes(actor)) return 'Cybercrime';
+            return 'Unknown';
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const icons = {
+                success: 'fa-check-circle text-[var(--success)]',
+                error: 'fa-exclamation-circle text-[var(--danger)]',
+                warning: 'fa-exclamation-triangle text-[var(--warning)]',
+                info: 'fa-info-circle text-[var(--info)]'
+            };
+            
+            toast.className = 'toast px-4 py-3 flex items-center gap-3 animate-slide-in';
+            toast.innerHTML = `
+                <i class="fas ${icons[type]}"></i>
+                <span class="flex-1">${message}</span>
+                <button onclick="this.parentElement.remove()" class="btn btn-ghost p-1">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function debounce(fn, delay) {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn(...args), delay);
+            };
+        }
+
+        // =====================================================
+        // KEYBOARD SHORTCUTS
+        // =====================================================
+        let keyBuffer = '';
+        
+        document.addEventListener('keydown', (e) => {
+            // Ignore if typing in input
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                if (e.key === 'Escape') e.target.blur();
+                return;
+            }
+            
+            // Single key shortcuts
+            if (e.key === '/') {
+                e.preventDefault();
+                document.getElementById('globalSearch').focus();
+            } else if (e.key === '?') {
+                e.preventDefault();
+                document.getElementById('shortcutsModal').classList.remove('hidden');
+                document.getElementById('shortcutsModal').classList.add('flex');
+            } else if (e.key === 'r' || e.key === 'R') {
+                e.preventDefault();
+                refreshAllData();
+            } else if (e.key === 't' || e.key === 'T') {
+                e.preventDefault();
+                toggleTheme();
+            } else if (e.key === 'Escape') {
+                closeModal('iocModal');
+                closeModal('shortcutsModal');
+                document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
+            }
+            
+            // Two-key shortcuts (g + key)
+            if (e.key === 'g' || e.key === 'G') {
+                keyBuffer = 'g';
+                setTimeout(() => keyBuffer = '', 1000);
+            } else if (keyBuffer === 'g') {
+                if (e.key === 'd') window.location.hash = '#dashboard';
+                else if (e.key === 'n') window.location.hash = '#news';
+                else if (e.key === 'i') window.location.hash = '#iocs';
+                else if (e.key === 'a') window.location.hash = '#actors';
+                else if (e.key === 'w') window.location.hash = '#watchlist';
+                else if (e.key === 's') window.location.hash = '#settings';
+                keyBuffer = '';
+            }
+        });
+
+        // =====================================================
+        // EVENT LISTENERS
+        // =====================================================
+        document.getElementById('newsSearch')?.addEventListener('input', debounce(updateNews, 300));
+        document.getElementById('newsCategory')?.addEventListener('change', updateNews);
+        document.getElementById('newsSeverity')?.addEventListener('change', updateNews);
+        document.getElementById('newsSource')?.addEventListener('change', updateNews);
+        document.getElementById('newsSort')?.addEventListener('change', updateNews);
+        document.getElementById('iocSearch')?.addEventListener('input', debounce(renderIOCTable, 300));
+        document.getElementById('actorSearch')?.addEventListener('input', debounce(updateActors, 300));
+        document.getElementById('watchlistInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addToWatchlist();
+        });
+        document.getElementById('globalSearch')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                window.location.hash = '#news';
+                setTimeout(() => {
+                    document.getElementById('newsSearch').value = e.target.value;
+                    updateNews();
+                    e.target.value = '';
+                }, 100);
+            }
+        });
+
+        // Close dropdowns on outside click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
+            }
+        });
+
+        // Theme change listener
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (localStorage.getItem('theme') === 'system') {
+                applyTheme('system');
+                if (threatChart) initChart();
+            }
+        });
+
+        // =====================================================
+        // INITIALIZATION
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initRouter();
+            fetchAllFeeds();
+            
+            // Auto-refresh
+            setInterval(() => {
+                if (!document.hidden) fetchAllFeeds();
+            }, CONFIG.REFRESH_INTERVAL);
+        });
+    </script>
+</body>
+</html>
