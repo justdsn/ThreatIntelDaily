@@ -15,6 +15,12 @@
 
 ---
 
+<img width="1919" height="911" alt="image" src="https://github.com/user-attachments/assets/20087312-9c27-4c38-816e-080d58e9b680" />
+<img width="1919" height="908" alt="image" src="https://github.com/user-attachments/assets/0fe2033f-8f47-4bec-965a-7462d13120fc" />
+<img width="1918" height="908" alt="image" src="https://github.com/user-attachments/assets/79269d43-061f-4ea0-af0c-d31d15fe28a6" />
+<img width="1919" height="909" alt="image" src="https://github.com/user-attachments/assets/fa8468ec-d966-43eb-85a1-74dcf83f0472" />
+
+
 ## 🎯 The Problem We Solve
 
 Security teams are overwhelmed. They spend hours manually monitoring multiple sources, extracting IOCs, and correlating threat data. Generic RSS readers like Feedly and Inoreader aren't built for security workflows—and they're cluttered with **ads, sponsored content, and irrelevant noise**.
