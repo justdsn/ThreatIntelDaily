@@ -1,18 +1,16 @@
-# 🛡️ Threat Intel Daily
+# Threat Intel Daily
 
 <div align="center">
-
-![Threat Intel Daily](https://img.shields.io/badge/Threat%20Intel-Daily-1d4ed8?style=for-the-badge&logo=shield&logoColor=white)
-![Version](https://img.shields.io/badge/Version-2.0.0-22c55e?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-3b82f6?style=for-the-badge)
 ![Sources](https://img.shields.io/badge/Sources-40+-8b5cf6?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Production%20Ready-22c55e?style=for-the-badge)
 
 **Enterprise-grade cybersecurity threat intelligence platform with automatic IOC extraction, threat actor tracking, and actionable security insights.**
 
-[🚀 Live Demo](#-quick-start) • [📖 Documentation](#-api-documentation) • [🎯 Features](#-key-features) • [💼 Enterprise](#-enterprise-features)
-
 </div>
+
+<img width="1918" height="915" alt="image" src="https://github.com/user-attachments/assets/bcd8a7d7-b8b5-4fdc-9a45-a17f56110416" />
+
 
 ---
 
