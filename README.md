@@ -1,10 +1,5 @@
 # Threat Intel Daily
 
-<div align="center">
-![License](https://img.shields.io/badge/License-MIT-3b82f6?style=for-the-badge)
-![Sources](https://img.shields.io/badge/Sources-40+-8b5cf6?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Production%20Ready-22c55e?style=for-the-badge)
-
 **Enterprise-grade cybersecurity threat intelligence platform with automatic IOC extraction, threat actor tracking, and actionable security insights.**
 
 </div>
